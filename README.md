@@ -3,7 +3,7 @@
 
 php/database.php blir ignorert og inneholder:
 
-$hn = 'hostnavn';
-$db = 'database';
-$un = 'brukernavn';
+$hn = 'hostnavn';<br>
+$db = 'database';<br>
+$un = 'brukernavn';<br>
 $pw = 'passord';
