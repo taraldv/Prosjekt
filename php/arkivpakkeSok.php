@@ -1,5 +1,5 @@
 <?php  
-require_once 'database.php';
+require_once 'hjelpeFunksjoner.php';
 session_start();
 if(isset($_SESSION['brukernavn'])){
 	$query = 'SELECT k.kommuneNavn,b.brukerNavn,a.statusTekst,a.startDato,a.sluttDato,a.sistEndret,a.dokfil,a.arkivID
@@ -17,14 +17,8 @@ if(isset($_SESSION['brukernavn'])){
 	OR a.dokfil LIKE ?
 	ORDER BY a.sluttDato DESC';
 	$arkivpakke = '%'.$_POST['arkivpakke'].'%';
-	$conn = new mysqli($hn, $un, $pw, $db);
-	$conn->set_charset("utf8");
-	$stmt = $conn->prepare($query);
-	$stmt->bind_param('sssssss', $arkivpakke,$arkivpakke,$arkivpakke,$arkivpakke,$arkivpakke,$arkivpakke,$arkivpakke);
-	$stmt->execute();
-	$result = $stmt->get_result();
-	echo json_encode($result->fetch_all(MYSQLI_ASSOC));
-	$stmt->close();
-	$conn->close();
+	$param = array($arkivpakke,$arkivpakke,$arkivpakke,$arkivpakke,$arkivpakke,$arkivpakke,$arkivpakke);
+	$result = databaseKobling($query,'sssssss',$param);
+	echo json_encode($result);
 }
 ?>

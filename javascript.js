@@ -152,7 +152,7 @@ function settInnPassordEndring(){
 	+"<label id='passordSjekk' for='gammeltPassord'></label>"
 	//+"<p id='passordSjekk'></p>"
 	+"<input id='nyttPassord' type=password required placeholder='Nytt passord'>"
-	+"<button onClick='updatePassword()'>Endre passord</button>";
+	+"<button onClick='oppdaterPassord()'>Endre passord</button>";
 	document.getElementById("innhold").insertAdjacentHTML('beforeend', html);
 
 	var gammeltPassord = document.getElementById("gammeltPassord");
