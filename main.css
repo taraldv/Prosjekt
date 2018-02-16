@@ -25,7 +25,7 @@ header{
 	z-index: 1;
 	display: inline-block;
 	min-height: 80vh;
-	min-width: 1000px;
+	min-width: 1200px;
 	margin: auto;
 	background-color: white;
 }
@@ -43,7 +43,7 @@ header{
 	font-size: 1.2em;
 }
 #loginLeft{
-	width: 60%;
+	width: 50%;
 	display: inline-block;
 	text-align: left;
 }
@@ -51,7 +51,7 @@ header{
 	text-align: center;
 }
 #loginRight{
-	width: 40%;
+	width: 50%;
 	display: inline-block;
 	text-align: right;
 }
