@@ -19,7 +19,7 @@ function lesURL(){
 			settInnInnlogging();
 			settInnKommuneSøk();
 
-			//Endrer url slik at refresh ikke viser error
+			//Endrer url slik at bruker ikke ser ?error
 			window.history.pushState("", "", "index.html");
 		}
 
@@ -177,28 +177,27 @@ function settInnArkivpakkeSøk(antall) {
 function settInnPassordEndring(){
 	tømInnhold();
 	var html = "<input id='gammeltPassord' type=password required placeholder='Gammelt passord'>"
-	+"<label id='passordSjekk' for='gammeltPassord'></label>"
-	//+"<p id='passordSjekk'></p>"
 	+"<input id='nyttPassord' type=password required placeholder='Nytt passord'>"
 	+"<button id='oppdaterPassordButton'>Endre passord</button>";
 	document.getElementById("innhold").insertAdjacentHTML('beforeend', html);
-
-	document.getElementById("oppdaterPassordButton").addEventListener("click",oppdaterPassord);
-
 	var gammeltPassord = document.getElementById("gammeltPassord");
 
+	//Legger til eventListener slik at klikk på knapp eller 'Enter' i input oppdater passord
+	document.getElementById("oppdaterPassordButton").addEventListener("click",oppdaterPassord);
 	gammeltPassord.addEventListener("keyup", enterKeyListener);
 	document.getElementById("nyttPassord").addEventListener("keyup", enterKeyListener);
 
+	//Funksjon som sjekker om Enter har blitt trykket og kjører oppdaterPassord hvis ja
 	function enterKeyListener(event){
 		if (event.key === "Enter") {
 			oppdaterPassord()
 		}
 	}
 
+	//EventListener som kjører hvis input mister fokus.
 	gammeltPassord.addEventListener("focusout", function(){
-		var passord = document.getElementById("gammeltPassord").value;
-		httpPost(endrePassordValidity,"php/endrePassord.php","gammeltPassord="+passord)
+		//Sjekker om gammelt passord er kodkjent
+		httpPost(endrePassordValidity,"php/endrePassord.php","gammeltPassord="+this.value)
 	});
 }
 
@@ -228,14 +227,8 @@ function endrePassordValidity(){
 	var inputField = document.getElementById("gammeltPassord");
 	if (parseInt(this.response)==1) {
 		inputField.setCustomValidity("");
-		node.innerHTML = "✔";
-		node.classList.remove("red");
-		node.classList.add("green");
 	} else {
-		inputField.setCustomValidity("Invalid");
-		node.innerHTML = "X";
-		node.classList.remove("green");
-		node.classList.add("red");
+		inputField.setCustomValidity("Matcher ikke gammelt passord");
 	}
 }
 
