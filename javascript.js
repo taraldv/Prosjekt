@@ -1,12 +1,18 @@
-///function httpPost(funksjon,url,parameter)
-
+/* Funksjoner som blir mye brukt:
+https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById
+https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentHTML
+https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
+*/
 lesURL();
 
+//Funksjon som først sjekker om bruker har mislykket en inlogging.
+//Så sjekkes om bruker inlogget og skal se autorisert navigering eller vanlig index.
 function lesURL(){
 	slettNode(document.getElementById("javascript"));
-	try{
 
-		//Hvis URL har ? i seg og inneholder 'error'
+	//Mislykket inlogging har ?error i url og denne try blokken fungerer.
+	try{
 		var urlQuery = document.URL.split("?")[1];
 		if(urlQuery.indexOf("error")>=0){
 			document.getElementById("loginLeft").insertAdjacentHTML('beforeend',"<p class='red'>Feil passord eller brukernavn</p>");
@@ -16,12 +22,16 @@ function lesURL(){
 			//Endrer url slik at refresh ikke viser error
 			window.history.pushState("", "", "index.html");
 		}
+
+	//Hvis try blokken ikke fungerer så sjekkes det om bruker har en session eller ikke
 	} catch (TypeError){
-		//Sender en tom POST til sessionSjekk.php som returnerer brukernavn fra session hvis den eksisterer.
+		//Sender en POST uten parameter til sessionSjekk.php
 		httpPost(function(){
+			//Responsen fra php er brukernavn: $brukernavn i JSON format hvis session eksisterer.
 			if (this.response.length>0) {
 				var brukernavn = JSON.parse(this.response).brukernavn;
 				settInnAutentisertNavigering(brukernavn);
+				settInnArkivpakkeSøk();
 			} else {
 				settInnInnlogging();
 				settInnKommuneSøk();
@@ -43,9 +53,10 @@ function settInnInnlogging(){
 //setter inn resultatet i en tabell i 'innhold' div
 function kommuneSøk(){
 	var tekst = document.getElementById("KommuneSøkInput").value;
+	slettNode(document.getElementById("kommuneSøkResultat"));
 	httpPost(function(){
 		var antallDeponeringer = JSON.parse(this.response)[tekst];
-		var html = "<table><tr><th>Kommune</th><th>Antall Deponeringer</th></tr>"
+		var html = "<table id='kommuneSøkResultat'><tr><th>Kommune</th><th>Antall Deponeringer</th></tr>"
 		+"<tr><td>"+tekst+"</td><td>"+antallDeponeringer+"</td></tr></table>";
 		document.getElementById("innhold").insertAdjacentHTML('beforeend',html);
 	},"php/kommuneSok.php","kommune="+tekst);
@@ -56,7 +67,7 @@ function settInnKommuneSøk(){
 	tømInnhold();
 	var html = "<p>Søk etter antall deponeringer i en kommune</p>"
 	+ "<input id='KommuneSøkInput' type='text' placeholder='Kommunenavn'>"
-	+ "<button onClick='kommuneSøk()'>Søk</button>";
+	+ "<button id='KommuneSøkButton'>Søk</button>";
 	document.getElementById("innhold").insertAdjacentHTML('beforeend', html);
 	//Gjør at enter kan brukes til å starte søket
 	document.getElementById("KommuneSøkInput").addEventListener("keyup", function(event){
@@ -64,6 +75,7 @@ function settInnKommuneSøk(){
 			kommuneSøk();
 		}
 	});
+	document.getElementById("KommuneSøkButton").addEventListener("click",kommuneSøk);
 }
 
 //Legger inn navigering til en bruker som har logget inn
@@ -72,17 +84,19 @@ function settInnAutentisertNavigering(brukernavn){
 	var loginLeft = document.getElementById("loginLeft");
 
 	var loginRightHTML = "<p>"+brukernavn+"</p>"
-	+"<button type='button' onClick='settInnPassordEndring()'>Endre passord</button>"
+	+"<button id='endrePassordButton' type='button'>Endre passord</button>"
 	+"<form action='php/utlogging.php' method='POST'>"
 	+ "<button type='submit'>Logg ut</button>"
 	+ "</form>";
 	loginRight.insertAdjacentHTML('afterbegin', loginRightHTML);
+	document.getElementById("endrePassordButton").addEventListener("click",settInnPassordEndring);
 
-	var loginLeftHTML = "<button onClick='settInnArkivpakkeSøk(10)'>Søk i arkivpakker</button>"
-	+"<button onClick='settInnKommuneSøk()'>Søk i kommuner</button>"
+	var loginLeftHTML = "<button id='arkivpakkeSøkNavigering'>Søk i arkivpakker</button>"
+	+"<button id='kommuneSøkNavigering'>Søk i kommuner</button>"
 	+"<button>Legg til ny arkivpakke</button>"
 	loginLeft.insertAdjacentHTML('afterbegin',loginLeftHTML);
-	settInnArkivpakkeSøk(10);
+	document.getElementById("kommuneSøkNavigering").addEventListener("click",settInnKommuneSøk);
+	document.getElementById("arkivpakkeSøkNavigering").addEventListener("click",settInnArkivpakkeSøk);
 }
 
 function arkivpakkeHTML(){
@@ -97,39 +111,29 @@ function arkivpakkeHTML(){
 		+"<td>"+data[key].startDato+"</td>"
 		+"<td>"+data[key].sluttDato+"</td>"
 		+"<td>"+data[key].sistEndret+"</td>"
-		+"<td><a class='fil' src='"+data[key].dokfil+"'>Fil</a></td>"
-		+"<td class='logg' onClick=settInnArkivpakkeLogg("+data[key].arkivID+")>Logg</td>"
-		+"<td class='endre' onClick=endreArkiv("+data[key].arkivID+")>Endre</td>"
-		+"<td class='slett' data='"+data[key].arkivID+"' onClick=slettArkivpakke(this)>Slett</td></tr>";
+		+"<td data='"+data[key].dokfil+"'>Fil</td>"
+		+"<td data='"+data[key].arkivID+"' class='logg'>Logg</td>"
+		+"<td data='"+data[key].arkivID+"' class='endre'>Endre</td>"
+		+"<td data='"+data[key].arkivID+"' class='slett'>Slett</td></tr>";
 	}
 	document.getElementById("innhold").insertAdjacentHTML('beforeend',html+="</table>");
-}
-
-function arkivpakkeSøk(){
-	var inputNode = document.getElementById("arkivpakkeSøk");
-	httpPost(arkivpakkeHTML,"php/arkivpakkeSok.php","arkivpakke="+inputNode.value);
-	document.getElementById("sokResultat").innerHTML="Søk: "+inputNode.value;
-	inputNode.value="";
-}
-
-function settInnArkivpakkeSøk(antall) {
-	tømInnhold();
-	httpPost(arkivpakkeHTML,"php/oversikt.php","antall="+antall);
-	var html = "<p id='sokResultat'>Søk etter arkivpakke</p>"
-	+"<input id='arkivpakkeSøk' type='text' placeholder='Søk i arkivpakke database'>"
-	+"<button onClick='arkivpakkeSøk()'>Søk</button>"
-	document.getElementById("innhold").insertAdjacentHTML('beforeend',html);
-	document.getElementById("arkivpakkeSøk").addEventListener("keyup", function(event){
-		if (event.key === "Enter") {
-			arkivpakkeSøk();
+	var loggNodes = document.getElementsByClassName("logg");
+	var endreNodes = document.getElementsByClassName("endre");
+	var slettNodes = document.getElementsByClassName("slett");
+	//if (loggNodes.length == endreNodes.length && loggNodes.length == slettNodes.length && loggNodes) {
+		for(x=0;x<loggNodes.length;x++){
+			//loggNodes[x].addEventListener("click",slettArkivpakke);
+			//endreNodes[x].addEventListener("click",slettArkivpakke);
+			slettNodes[x].addEventListener("click",slettArkivpakke);
 		}
-	});
+	//}
+
 }
 
 //Sender POST til arkivpakkeSlett.php med id fra valgt element og endrer elementet hvis raden blir slettet i databasen.
-function slettArkivpakke(element){
-	var id = element.getAttribute("data");
-	var row = element.parentNode;
+function slettArkivpakke(){
+	var id = this.getAttribute("data");
+	var row = this.parentNode;
 	if (window.confirm("Er du sikker på sletting av arkivpakke?")) { 
 		httpPost(function(){
 			if (parseInt(this.response)==1) {
@@ -142,6 +146,30 @@ function slettArkivpakke(element){
 	}
 }
 
+function arkivpakkeSøk(){
+	var inputNode = document.getElementById("arkivpakkeSøk");
+	httpPost(arkivpakkeHTML,"php/arkivpakkeSok.php","arkivpakke="+inputNode.value);
+	document.getElementById("sokResultat").innerHTML="Søk: "+inputNode.value;
+	inputNode.value="";
+}
+
+function settInnArkivpakkeSøk(antall) {
+	if (!antall) {
+		antall = 10;
+	}
+	tømInnhold();
+	httpPost(arkivpakkeHTML,"php/oversikt.php","antall="+antall);
+	var html = "<p id='sokResultat'>Søk etter arkivpakke</p>"
+	+"<input id='arkivpakkeSøk' type='text' placeholder='Søk i arkivpakke database'>"
+	+"<button id='arkivpakkeSøkButton'>Søk</button>"
+	document.getElementById("innhold").insertAdjacentHTML('beforeend',html);
+	document.getElementById("arkivpakkeSøk").addEventListener("keyup", function(event){
+		if (event.key === "Enter") {
+			arkivpakkeSøk();
+		}
+	});
+	document.getElementById("arkivpakkeSøkButton").addEventListener("click",arkivpakkeSøk);
+}
 
 
 //Setter inn html for passord endring og legger til eventListeners slik at 'Enter' starter funksjonen 'oppdaterPassord'
@@ -152,8 +180,10 @@ function settInnPassordEndring(){
 	+"<label id='passordSjekk' for='gammeltPassord'></label>"
 	//+"<p id='passordSjekk'></p>"
 	+"<input id='nyttPassord' type=password required placeholder='Nytt passord'>"
-	+"<button onClick='oppdaterPassord()'>Endre passord</button>";
+	+"<button id='oppdaterPassordButton'>Endre passord</button>";
 	document.getElementById("innhold").insertAdjacentHTML('beforeend', html);
+
+	document.getElementById("oppdaterPassordButton").addEventListener("click",oppdaterPassord);
 
 	var gammeltPassord = document.getElementById("gammeltPassord");
 
