@@ -42,13 +42,13 @@ CREATE TABLE doklager (
    CREATE TABLE arkivpakke (
  	arkivID INTEGER AUTO_INCREMENT,
 	arkivskaper SMALLINT NOT NULL,
-	ansvarlig INTEGER,
-	statusTekst VARCHAR(100),
+	ansvarlig INTEGER NOT NULL,
+	statusTekst VARCHAR(100) NOT NULL,
 	startDato DATE NOT NULL,
 	sluttDato DATE NOT NULL,
 	sistEndret TIMESTAMP,
 	endretAv INTEGER,
-	dokfil VARCHAR(150),
+	dokfil VARCHAR(150) NOT NULL,
 	CONSTRAINT arkivpakkePK
 	PRIMARY KEY (arkivID),
 	CONSTRAINT statustypeFK

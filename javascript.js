@@ -29,8 +29,11 @@ function lesURL(){
 		httpPost(function(){
 			//Responsen fra php er brukernavn: $brukernavn i JSON format hvis session eksisterer.
 			if (this.response.length>0) {
-				var brukernavn = JSON.parse(this.response).brukernavn;
-				settInnAutentisertNavigering(brukernavn);
+				var data = JSON.parse(this.response);
+				var fornavn = storBokstav(data.fornavn);
+				var etternavn = storBokstav(data.etternavn);
+
+				settInnAutentisertNavigering(fornavn,etternavn);
 				settInnArkivpakkeSøk();
 			} else {
 				settInnInnlogging();
@@ -79,11 +82,11 @@ function settInnKommuneSøk(){
 }
 
 //Legger inn navigering til en bruker som har logget inn
-function settInnAutentisertNavigering(brukernavn){
+function settInnAutentisertNavigering(fornavn,etternavn){
 	var loginRight = document.getElementById("loginRight");
 	var loginLeft = document.getElementById("loginLeft");
 
-	var loginRightHTML = "<p>"+brukernavn+"</p>"
+	var loginRightHTML = "<p>"+fornavn+" "+etternavn+"</p>"
 	+"<button id='endrePassordButton' type='button'>Endre passord</button>"
 	+"<form action='php/utlogging.php' method='POST'>"
 	+ "<button type='submit'>Logg ut</button>"
@@ -171,6 +174,10 @@ function settInnArkivpakkeSøk(antall) {
 	document.getElementById("arkivpakkeSøkButton").addEventListener("click",arkivpakkeSøk);
 }
 
+function settInnArkivpakkeInput(){
+	tømInnhold();
+
+}
 
 //Setter inn html for passord endring og legger til eventListeners slik at 'Enter' starter funksjonen 'oppdaterPassord'
 //'gammeltPassord' input for også en eventListener på 'focusout' som sjekker validity
@@ -263,4 +270,10 @@ function slettNode(node){
 	if(node){
 		node.parentNode.removeChild(node);
 	}
+}
+
+//Sender tilbake ordet med første bokstav som stor
+function storBokstav(ord){
+	var stor = ord.charAt(0).toUpperCase();
+	return stor+ord.substring(1);
 }
