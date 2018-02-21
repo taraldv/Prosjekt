@@ -24,7 +24,7 @@ function lesURL(){
 		}
 
 	//Hvis try blokken ikke fungerer så sjekkes det om bruker har en session eller ikke
-	} catch (TypeError){
+} catch (TypeError){
 		//Sender en POST uten parameter til sessionSjekk.php
 		httpPost(function(){
 			//Responsen fra php er brukernavn: $brukernavn i JSON format hvis session eksisterer.
@@ -96,13 +96,14 @@ function settInnAutentisertNavigering(fornavn,etternavn){
 
 	var loginLeftHTML = "<button id='arkivpakkeSøkNavigering'>Søk i arkivpakker</button>"
 	+"<button id='kommuneSøkNavigering'>Søk i kommuner</button>"
-	+"<button>Legg til ny arkivpakke</button>"
+	+"<button id='leggTilArkivpakkeNavigering'>Legg til ny arkivpakke</button>"
 	loginLeft.insertAdjacentHTML('afterbegin',loginLeftHTML);
+	document.getElementById("leggTilArkivpakkeNavigering").addEventListener("click",settInnLeggTilArkivpakke);
 	document.getElementById("kommuneSøkNavigering").addEventListener("click",settInnKommuneSøk);
 	document.getElementById("arkivpakkeSøkNavigering").addEventListener("click",settInnArkivpakkeSøk);
 }
 
-function arkivpakkeHTML(){
+function settInnArkivpakkeOversikt(){
 	slettNode(document.getElementById("arkivpakkeTabell"));
 	var data = JSON.parse(this.response);
 	var html = "<table id='arkivpakkeTabell'><tr><th>Arkivskaper</th><th>Ansvarlig</th><th>Status</th>"
@@ -151,17 +152,17 @@ function slettArkivpakke(){
 
 function arkivpakkeSøk(){
 	var inputNode = document.getElementById("arkivpakkeSøk");
-	httpPost(arkivpakkeHTML,"php/arkivpakkeSok.php","arkivpakke="+inputNode.value);
+	httpPost(settInnArkivpakkeOversikt,"php/arkivpakkeSok.php","arkivpakke="+inputNode.value);
 	document.getElementById("sokResultat").innerHTML="Søk: "+inputNode.value;
 	inputNode.value="";
 }
 
 function settInnArkivpakkeSøk(antall) {
-	if (!antall) {
+	if (!antall || !Number.isInteger(antall)) {
 		antall = 10;
 	}
 	tømInnhold();
-	httpPost(arkivpakkeHTML,"php/oversikt.php","antall="+antall);
+	httpPost(settInnArkivpakkeOversikt,"php/oversikt.php","antall="+antall);
 	var html = "<p id='sokResultat'>Søk etter arkivpakke</p>"
 	+"<input id='arkivpakkeSøk' type='text' placeholder='Søk i arkivpakke database'>"
 	+"<button id='arkivpakkeSøkButton'>Søk</button>"
@@ -174,8 +175,78 @@ function settInnArkivpakkeSøk(antall) {
 	document.getElementById("arkivpakkeSøkButton").addEventListener("click",arkivpakkeSøk);
 }
 
-function settInnArkivpakkeInput(){
+function settInnLeggTilArkivpakke(){
 	tømInnhold();
+	httpPost(function(){
+		var options = "";
+		var data = JSON.parse(this.response);
+		for (var key in data) {
+			options += "<option>"+data[key].statusTekst+"</option>";
+		}
+
+		var html = "<div id='leggTilArkivpakkeDiv'><p>Legg til ny arkivpakke</p>"
+		+"<input id='arkivpakkeFilInput' type='file'>"
+		+"<input id='arkivpakkeKommuneInput' type='text' placeholder='Kommune'>"
+		+"<select id='arkivpakkeStatusSelect'>"+options+"</select>"
+		+"<label for='arkivpakkeStartDatoInput'>Gyldig dato: åååå-mm-dd</label>"
+		+"<input id='arkivpakkeStartDatoInput' type='text' placeholder='Start dato'>"
+		+"<input id='arkivPakkeSluttDatoInput' type='text' placeholder='Slutt dato'>"
+		+"<button id='leggTilArkivpakkeButton'>Legg til arkivpakke</button></div>";
+		document.getElementById("innhold").insertAdjacentHTML('beforeend',html);
+		document.getElementById("leggTilArkivpakkeButton").addEventListener("click",sendInnNyArkivpakke);
+
+	},"php/leggTilArkivpakke.php","statustype=statustype");
+}
+
+function sendInnNyArkivpakke(){
+	var filInput = document.getElementById("arkivpakkeFilInput");
+	var fil = filInput.files[0];
+	var kommuneInput = document.getElementById("arkivpakkeKommuneInput");
+	var statusTekstSelect = document.getElementById("arkivpakkeStatusSelect")
+	var statusTekst = statusTekstSelect[statusTekstSelect.selectedIndex].value;
+	var startDatoInput = document.getElementById("arkivpakkeStartDatoInput");
+	var sluttDatoInput = document.getElementById("arkivPakkeSluttDatoInput");
+	httpPost(function(){
+		//Resetter validity
+		kommuneInput.setCustomValidity("");
+		startDatoInput.setCustomValidity("");
+		sluttDatoInput.setCustomValidity("");
+		//Regex som matcher 4 tall - 1 eller 2 tall - 1 eller 2 tall
+		var regex = /\d{4}-\d{1,2}-\d{1,2}/;  
+
+		//I stedet for regex som sjekker etter skuddår gjøres string om til dato
+		//Date.parse returnerer NaN hvis ugyldig
+		var startDato = Date.parse(regex.exec(startDatoInput.value));
+		var sluttDato = Date.parse(regex.exec(sluttDatoInput.value));
+
+		//Må visst bruke formData for å sende fil uten en HTML form
+		var formData = new FormData();
+		formData.append("kommune", kommuneInput.value);
+		formData.append("startDato", startDatoInput.value); 
+		formData.append("sluttDato", sluttDatoInput.value);
+		formData.append("statusTekst", statusTekst); 
+		formData.append("fil", fil);
+
+		//Sjekker om kommune og datoer er gyldige
+		if (fil && JSON.parse(this.response).length>0 && !isNaN(startDato) && !isNaN(sluttDato)) {
+			slettNode(document.getElementById("leggTilArkivpakkeDiv"));
+			httpPost(function(){console.log(this.response)},"php/leggTilArkivpakke.php",formData,"multipart/form-data");
+		};
+		if (JSON.parse(this.response)==0) {
+			kommuneInput.setCustomValidity("Ugyldig kommune");
+		}
+		if (isNaN(startDato) || !regex.exec(startDatoInput.value)) {
+			startDatoInput.setCustomValidity("Ugyldig dato");
+		}
+		if (isNaN(sluttDato) || !regex.exec(sluttDatoInput.value)) {
+			sluttDatoInput.setCustomValidity("Ugyldig dato");
+		}
+		if (!fil) {
+			filInput.setCustomValidity("Fil ikke valgt");
+		} else if (fil.size>1000000) {
+			filInput.setCustomValidity("Fil for stor");
+		}
+	},"php/leggTilArkivpakke.php","validering=validering&kommune="+kommuneInput.value);
 
 }
 
@@ -197,55 +268,58 @@ function settInnPassordEndring(){
 	//Funksjon som sjekker om Enter har blitt trykket og kjører oppdaterPassord hvis ja
 	function enterKeyListener(event){
 		if (event.key === "Enter") {
-			oppdaterPassord()
+			oppdaterPassord();
 		}
 	}
 
 	//EventListener som kjører hvis input mister fokus.
 	gammeltPassord.addEventListener("focusout", function(){
-		//Sjekker om gammelt passord er kodkjent
-		httpPost(endrePassordValidity,"php/endrePassord.php","gammeltPassord="+this.value)
+		//Sjekker om gammelt passord er godkjent
+		endrePassordValidity(this.value);
 	});
+
 }
 
 //Sender POST til endrePassord.php hvis begge input er valid
 function oppdaterPassord(){
 	var nyttPassordInput = document.getElementById("nyttPassord");
 	var gammeltPassordInput = document.getElementById("gammeltPassord");
-
+	//Sjekker om gammelt passord er godkjent
+	endrePassordValidity(gammeltPassordInput.value);
 	//Sjekker om input er valid
 	if(gammeltPassordInput.checkValidity() && nyttPassordInput.checkValidity()){
-		httpPost(godkjentPassordEndring,"php/endrePassord.php","nyttPassord="+nyttPassordInput.value
-			+"&gammeltPassord="+gammeltPassordInput.value);
+		httpPost(function(){
+			if (parseInt(this.response)==1){
+				tømInnhold();
+				document.getElementById("innhold").insertAdjacentHTML('beforeend',"<p class='green'>Passord har blitt endret</p>");
+			} else {
+				//sql error
+			}
+		},"php/endrePassord.php","nyttPassord="+nyttPassordInput.value+"&gammeltPassord="+gammeltPassordInput.value);
 	}
 }
 
-function godkjentPassordEndring(){
-	if (parseInt(this.response)==1){
-		tømInnhold();
-		document.getElementById("innhold").insertAdjacentHTML('beforeend',"<p class='green'>Passord har blitt endret</p>");
-	} else {
-		//Kode hvis passord ikke ble endret (php/sql error)
-	}
-}
-
-function endrePassordValidity(){
-	var node = document.getElementById("passordSjekk");
-	var inputField = document.getElementById("gammeltPassord");
-	if (parseInt(this.response)==1) {
-		inputField.setCustomValidity("");
-	} else {
-		inputField.setCustomValidity("Matcher ikke gammelt passord");
-	}
+function endrePassordValidity(passord){
+	httpPost(function(){
+		var inputField = document.getElementById("gammeltPassord");
+		if (parseInt(this.response)==1) {
+			inputField.setCustomValidity("");
+		} else {
+			inputField.setCustomValidity("Matcher ikke gammelt passord");
+		}
+	},"php/endrePassord.php","gammeltPassord="+passord);
 }
 
 
 //Sender POST spørring med paramter til URL. Med en eventlistener som kjører på 'load'
-function httpPost(funksjon,url,parameter){
+function httpPost(funksjon,url,parameter,content){
+	if(!content){
+		content = "application/x-www-form-urlencoded";
+	}
 	var xmlHttpRequest = new XMLHttpRequest();
 	xmlHttpRequest.addEventListener("load", funksjon);
 	xmlHttpRequest.open("POST", url);
-	xmlHttpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xmlHttpRequest.setRequestHeader("Content-type", content);
 	xmlHttpRequest.send(parameter);
 }
 

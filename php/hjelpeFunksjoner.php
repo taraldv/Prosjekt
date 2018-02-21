@@ -1,4 +1,14 @@
-<?php  
+<?php 
+
+function databaseKoblingUtenParam($queryString){
+	require 'database.php';
+	$conn = new mysqli($hn, $un, $pw, $db);
+	if ($conn->connect_error) die($conn->connect_error);
+	$conn->set_charset("utf8");
+	$result = $conn->query($queryString);
+	return $result->fetch_all(MYSQLI_ASSOC);
+}
+
 function databaseKobling($queryString,$typeString,$paramArray){
 	require 'database.php';
 	$conn = new mysqli($hn, $un, $pw, $db);
@@ -20,11 +30,8 @@ function databaseKobling($queryString,$typeString,$paramArray){
 	$result = $stmt->get_result();
 	if ($result) {
 		return $result->fetch_all(MYSQLI_ASSOC);
-		$stmt->close();
-		$conn->close();
 	} else {
 		return $stmt->affected_rows;
 	}
-	
 }
 ?>
