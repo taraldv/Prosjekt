@@ -211,9 +211,9 @@ function settInnLeggTilArkivpakke(){
 				+"<div class='col-sm-3'>"
 				+"<input type='text' class='form-control' id='arkivpakkeStartDatoInput' placeholder='Start dato'></div></div>"
 				+"<div class='form-group'>"
-				+"<label class='control-label col-sm-3' for='arkivpakkeStartDatoInput'>Gyldig startdato: åååå-mm-dd</label>"
+				+"<label class='control-label col-sm-3' for='arkivpakkeSluttDatoInput'>Gyldig sluttdato: åååå-mm-dd</label>"
 				+"<div class='col-sm-3'>"
-				+"<input type='text' class='form-control' id='arkivpakkeStartDatoInput' placeholder='Start dato'></div></div>"
+				+"<input type='text' class='form-control' id='arkivpakkeSluttDatoInput' placeholder='Slutt dato'></div></div>"
 					
 				+"<div class='form-group'>"       
 				+"<div class='col-sm-offset-2 col-sm-3'>"
