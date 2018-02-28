@@ -115,7 +115,7 @@ function settInnArkivpakkeOversikt(){
 		+"<td>"+data[key].startDato+"</td>"
 		+"<td>"+data[key].sluttDato+"</td>"
 		+"<td>"+data[key].sistEndret+"</td>"
-		+"<td data='"+data[key].dokfil+"'>Fil</td>"
+		+"<td><a href='/php/hentFil.php?arkivID="+data[key].arkivID+"'>Fil</a></td>"
 		+"<td data='"+data[key].arkivID+"' class='logg'>Logg</td>"
 		+"<td data='"+data[key].arkivID+"' class='endre'>Endre</td>"
 		+"<td data='"+data[key].arkivID+"' class='slett'>Slett</td></tr>";
