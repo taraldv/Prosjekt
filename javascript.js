@@ -184,41 +184,42 @@ function settInnLeggTilArkivpakke(){
 			options += "<option>"+data[key].statusTekst+"</option>";
 		}
 
-        var html = "<div id='leggTilArkivpakkeDiv'><h2>Legg til ny arkivpakke</h2></br>"
-				
+		var html = "<div id='leggTilArkivpakkeDiv'><h2>Legg til ny arkivpakke</h2></br>"
 
-				+"<form class='form-horizontal' id='skjema' action='' method=''>"
-				  
-				+"<div class='form-group'>"
-				+"<label class='control-label col-sm-3' for='arkivpakkeFilInput'>Last opp METSFIL</label>"
-				+"<div class='col-sm-3'>"
-				+"<input type='file' id='arkivpakkeFilInput'></div></div>"
-					
-				+"<div class='form-group'>"
-				+"<label class='control-label col-sm-3' for='arkivpakkeKommuneInput'>Arkivskaper:</label>"
-				+"<div class='col-sm-3'>"
-				+"<input type='text' class='form-control' id='arkivpakkeKommuneInput' placeholder='Kommune'></div></div>"
-					
-				+"<div class='form-group'>"
-				+"<label class='control-label col-sm-3' for='arkivpakkeStatusSelect'>Status:</label>"
-				+"<div class='col-sm-3'>"
-				+"<select class='form-control' id='arkivpakkeStatusSelect'>"+options+"</select>"
-				+"</div></div>"
 
-				    
-				+"<div class='form-group'>"
-				+"<label class='control-label col-sm-3' for='arkivpakkeStartDatoInput'>Gyldig startdato: åååå-mm-dd</label>"
-				+"<div class='col-sm-3'>"
-				+"<input type='text' class='form-control' id='arkivpakkeStartDatoInput' placeholder='Start dato'></div></div>"
-				+"<div class='form-group'>"
-				+"<label class='control-label col-sm-3' for='arkivpakkeSluttDatoInput'>Gyldig sluttdato: åååå-mm-dd</label>"
-				+"<div class='col-sm-3'>"
-				+"<input type='text' class='form-control' id='arkivpakkeSluttDatoInput' placeholder='Slutt dato'></div></div>"
-					
-				+"<div class='form-group'>"       
-				+"<div class='col-sm-offset-2 col-sm-3'>"
-				+"<button id='leggTilArkivpakkeButton' type='submit' class='btn btn-primary'>Lagre</div></div>"
-				+"</form></div>";
+		+"<div class='form-horizontal' id='skjema' action='php/leggTilArkivpakke.php' method='POST'>"
+		//+"<form class='form-horizontal' id='skjema' action='php/leggTilArkivpakke.php' method='POST'>"
+
+		+"<div class='form-group'>"
+		+"<label class='control-label col-sm-3' for='arkivpakkeFilInput'>Last opp METSFIL</label>"
+		+"<div class='col-sm-3'>"
+		+"<input type='file' id='arkivpakkeFilInput'></div></div>"
+
+		+"<div class='form-group'>"
+		+"<label class='control-label col-sm-3' for='arkivpakkeKommuneInput'>Arkivskaper:</label>"
+		+"<div class='col-sm-3'>"
+		+"<input type='text' class='form-control' id='arkivpakkeKommuneInput' placeholder='Kommune'></div></div>"
+
+		+"<div class='form-group'>"
+		+"<label class='control-label col-sm-3' for='arkivpakkeStatusSelect'>Status:</label>"
+		+"<div class='col-sm-3'>"
+		+"<select class='form-control' id='arkivpakkeStatusSelect'>"+options+"</select>"
+		+"</div></div>"
+
+
+		+"<div class='form-group'>"
+		+"<label class='control-label col-sm-3' for='arkivpakkeStartDatoInput'>Gyldig startdato: åååå-mm-dd</label>"
+		+"<div class='col-sm-3'>"
+		+"<input type='text' class='form-control' id='arkivpakkeStartDatoInput' placeholder='Start dato'></div></div>"
+		+"<div class='form-group'>"
+		+"<label class='control-label col-sm-3' for='arkivpakkeSluttDatoInput'>Gyldig sluttdato: åååå-mm-dd</label>"
+		+"<div class='col-sm-3'>"
+		+"<input type='text' class='form-control' id='arkivpakkeSluttDatoInput' placeholder='Slutt dato'></div></div>"
+
+		+"<div class='form-group'>"       
+		+"<div class='col-sm-offset-2 col-sm-3'>"
+		+"<button id='leggTilArkivpakkeButton' type='submit' class='btn btn-primary'>Lagre</div></div>"
+		+"</div></div>";
 		document.getElementById("innhold").insertAdjacentHTML('beforeend',html);
 		document.getElementById("leggTilArkivpakkeButton").addEventListener("click",sendInnNyArkivpakke);
 
@@ -228,11 +229,12 @@ function settInnLeggTilArkivpakke(){
 function sendInnNyArkivpakke(){
 	var filInput = document.getElementById("arkivpakkeFilInput");
 	var fil = filInput.files[0];
+	console.log(fil);
 	var kommuneInput = document.getElementById("arkivpakkeKommuneInput");
 	var statusTekstSelect = document.getElementById("arkivpakkeStatusSelect")
 	var statusTekst = statusTekstSelect[statusTekstSelect.selectedIndex].value;
 	var startDatoInput = document.getElementById("arkivpakkeStartDatoInput");
-	var sluttDatoInput = document.getElementById("arkivPakkeSluttDatoInput");
+	var sluttDatoInput = document.getElementById("arkivpakkeSluttDatoInput");
 	httpPost(function(){
 		//Resetter validity
 		kommuneInput.setCustomValidity("");
@@ -257,7 +259,7 @@ function sendInnNyArkivpakke(){
 		//Sjekker om kommune og datoer er gyldige
 		if (fil && JSON.parse(this.response).length>0 && !isNaN(startDato) && !isNaN(sluttDato)) {
 			slettNode(document.getElementById("leggTilArkivpakkeDiv"));
-			httpPost(function(){console.log(this.response)},"php/leggTilArkivpakke.php",formData,"multipart/form-data");
+			httpPost(function(){console.log(this.response)},"php/leggTilArkivpakke.php",formData,true);
 		};
 		if (JSON.parse(this.response)==0) {
 			kommuneInput.setCustomValidity("Ugyldig kommune");
@@ -339,14 +341,14 @@ function endrePassordValidity(passord){
 
 
 //Sender POST spørring med paramter til URL. Med en eventlistener som kjører på 'load'
-function httpPost(funksjon,url,parameter,content){
-	if(!content){
-		content = "application/x-www-form-urlencoded";
-	}
+function httpPost(funksjon,url,parameter,boolean){
+	
 	var xmlHttpRequest = new XMLHttpRequest();
 	xmlHttpRequest.addEventListener("load", funksjon);
 	xmlHttpRequest.open("POST", url);
-	xmlHttpRequest.setRequestHeader("Content-type", content);
+	if(!boolean){
+		xmlHttpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	}
 	xmlHttpRequest.send(parameter);
 }
 
