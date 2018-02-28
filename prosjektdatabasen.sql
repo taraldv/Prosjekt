@@ -12,23 +12,24 @@ CREATE TABLE statustype (
 	statusTekst VARCHAR(150),
 	CONSTRAINT statusPK
 	PRIMARY KEY (statusTekst)
- ) engine = InnoDB DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+	) engine = InnoDB DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE doklager (
+	filID INTEGER AUTO_INCREMENT,
 	filnavn VARCHAR(150),
 	filstørrelse DECIMAL(4,1),
 	CONSTRAINT doklagerPK
-	PRIMARY KEY (filnavn)
- ) engine = InnoDB DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+	PRIMARY KEY (filID)
+	) engine = InnoDB DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
- CREATE TABLE kommune (
+CREATE TABLE kommune (
 	kommuneNr SMALLINT,
 	kommuneNavn VARCHAR(100),
 	CONSTRAINT kommunePK
 	PRIMARY KEY (kommuneNr)
- ) engine = InnoDB DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
- 
- CREATE TABLE bruker (
+	) engine = InnoDB DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE bruker (
 	brukerID INTEGER AUTO_INCREMENT,
 	brukernavn VARCHAR(100),
 	passord VARCHAR(100),
@@ -36,62 +37,74 @@ CREATE TABLE doklager (
 	etternavn VARCHAR(150),
 	CONSTRAINT brukerPK
 	PRIMARY KEY (brukerID)
-  ) engine = InnoDB DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
- 
+	) engine = InnoDB DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-   CREATE TABLE arkivpakke (
- 	arkivID INTEGER AUTO_INCREMENT,
+
+CREATE TABLE arkivpakke (
+	arkivID INTEGER AUTO_INCREMENT,
 	arkivskaper SMALLINT NOT NULL,
 	ansvarlig INTEGER NOT NULL,
 	statusTekst VARCHAR(100) NOT NULL,
 	startDato DATE NOT NULL,
 	sluttDato DATE NOT NULL,
-	sistEndret TIMESTAMP,
-	endretAv INTEGER,
-	dokfil VARCHAR(150) NOT NULL,
+	sistEndret TIMESTAMP NOT NULL,
+	endretAv INTEGER NOT NULL,
+	dokfil INTEGER NOT NULL,
 	CONSTRAINT arkivpakkePK
 	PRIMARY KEY (arkivID),
 	CONSTRAINT statustypeFK
 	FOREIGN KEY(statusTekst) REFERENCES statustype(statusTekst),
 	CONSTRAINT dokfilFK
-	FOREIGN KEY(dokfil) REFERENCES doklager(filnavn),
+	FOREIGN KEY(dokfil) REFERENCES doklager(filID),
 	CONSTRAINT arkivskaperFK
 	FOREIGN KEY(arkivskaper) REFERENCES kommune(kommuneNr),
 	CONSTRAINT ansvarligFK
 	FOREIGN KEY(ansvarlig) REFERENCES bruker(brukerID),
 	CONSTRAINT endretAvFK
 	FOREIGN KEY(endretAv) REFERENCES bruker(brukerID)
-   ) engine = InnoDB DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
- 
-    CREATE TABLE logg (
- 	loggID INTEGER AUTO_INCREMENT,
-	arkivID INTEGER,
+	) engine = InnoDB DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE logg (
+	loggID INTEGER AUTO_INCREMENT,
+	arkivID INTEGER NOT NULL,
 	arkivskaper SMALLINT NOT NULL,
-	ansvarlig INTEGER,
+	ansvarlig INTEGER NOT NULL,
 	statusTekst VARCHAR(100),
 	startDato DATE NOT NULL,
 	sluttDato DATE NOT NULL,
 	sistEndret TIMESTAMP,
 	endretAv INTEGER,
-	slettet DATETIME,
-	slettetAv INTEGER,
+	dokfil VARCHAR(150) NOT NULL,
+	slettet BOOLEAN,
 	CONSTRAINT loggPK
-	PRIMARY KEY (loggID),
-	CONSTRAINT arkivIDLFK
-	FOREIGN KEY(arkivID) REFERENCES arkivpakke(arkivID),
-	CONSTRAINT arkivskaperLFK
-	FOREIGN KEY(arkivskaper) REFERENCES kommune(kommuneNr),
-	CONSTRAINT ansvarligLFK
-	FOREIGN KEY(ansvarlig) REFERENCES bruker(brukerID),
-	CONSTRAINT endretAvLFK
-	FOREIGN KEY(endretAv) REFERENCES bruker(brukerID),
-	CONSTRAINT slettetAvLFK
-	FOREIGN KEY(slettetAv) REFERENCES bruker(brukerID),
-	CONSTRAINT statustypeLFK
-	FOREIGN KEY(statusTekst) REFERENCES statustype(statusTekst)
-  ) engine = InnoDB DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+	PRIMARY KEY (loggID)
+	) engine = InnoDB DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
- 
+
+
+DROP TRIGGER IF EXISTS arkivpakkeARD;
+DROP TRIGGER IF EXISTS arkivpakkeARU;
+
+DELIMITER ::
+
+CREATE TRIGGER arkivpakkeARU
+AFTER UPDATE ON arkivpakke
+FOR EACH ROW
+BEGIN
+		INSERT INTO logg(arkivID,arkivskaper,ansvarlig,statusTekst,startDato,sluttDato,sistEndret,endretAv,dokfil)
+		VALUES(OLD.arkivID,OLD.arkivskaper,OLD.ansvarlig,OLD.statusTekst,OLD.startDato,OLD.sluttDato,OLD.sistEndret,OLD.endretAv,OLD.dokfil);
+END::
+
+CREATE TRIGGER arkivpakkeARD
+AFTER DELETE ON arkivpakke
+FOR EACH ROW
+BEGIN
+		INSERT INTO logg(arkivID,arkivskaper,ansvarlig,statusTekst,startDato,sluttDato,sistEndret,endretAv,dokfil,slettet)
+		VALUES(OLD.arkivID,OLD.arkivskaper,OLD.ansvarlig,OLD.statusTekst,OLD.startDato,OLD.sluttDato,OLD.sistEndret,OLD.endretAv,OLD.dokfil,TRUE);
+END::
+
+DELIMITER ;
+
 INSERT INTO kommune
 VALUES(101,'Halden'),
 (102,'Sarpsborg'),
@@ -627,45 +640,86 @@ VALUES('avtalt'),
 ('godkjent'),
 ('i dsm');
 
-INSERT INTO arkivpakke
-(arkivskaper, ansvarlig, statusTekst, startDato, sluttDato)
-VALUES(712,2,'avvist, venter ny deponering','2005-8-24','2009-10-21')
-,(805,2,'avtalt','2008-4-21','2017-5-1')
-,(1630,2,'i test','2000-1-7','2003-9-18')
-,(1560,2,'i karantene','2004-5-20','2005-11-15')
-,(1265,1,'i test','2002-8-20','2010-3-16')
-,(437,2,'mottatt','2000-1-24','2005-10-4')
-,(432,1,'i dsm','2003-3-27','2010-4-24')
-,(1841,2,'avtalt','2000-7-26','2001-7-6')
-,(221,1,'i dsm','2004-7-23','2006-10-4')
-,(807,2,'i dsm','2000-4-17','2013-6-9')
-,(5054,1,'i karantene','2001-6-23','2005-8-24')
-,(1721,2,'i dsm','2012-4-1','2017-3-14')
-,(5015,1,'mottatt','2001-11-15','2007-9-8')
-,(1526,2,'i test','2010-1-5','2016-11-15')
-,(130,1,'avvist, venter ny deponering','2011-1-27','2017-10-14')
-,(1866,1,'i karantene','2000-5-14','2017-10-9')
-,(5047,1,'avtalt','2001-6-4','2005-5-20')
-,(821,1,'godkjent','2001-8-2','2012-2-2')
-,(536,1,'avvist, venter ny deponering','2001-1-10','2007-8-26')
-,(1567,2,'godkjent','2006-5-28','2009-8-11')
-,(940,2,'i dsm','2003-11-7','2014-7-24')
-,(1227,2,'avvist, venter ny deponering','2001-3-4','2014-2-10')
-,(5053,2,'avvist, venter ny deponering','2000-11-13','2004-11-4')
-,(1222,2,'i dsm','2005-11-15','2006-8-9')
-,(1805,2,'avtalt','2009-10-22','2015-2-7')
-,(5026,1,'i dsm','2001-2-4','2007-7-27')
-,(2016,2,'avvist, venter ny deponering','2010-3-15','2012-9-1')
-,(715,2,'i test','2003-1-15','2006-9-11')
-,(618,2,'godkjent','2009-11-1','2011-1-2')
-,(1915,2,'i dsm','2005-2-1','2014-7-9')
-,(5016,1,'mottatt','2009-5-19','2015-3-6')
-,(626,1,'i test','2009-10-1','2016-10-1')
-,(1915,2,'avtalt','2003-1-1','2004-9-28')
-,(5013,1,'avvist, venter ny deponering','2009-1-14','2012-5-15')
-,(226,2,'i karantene','2007-3-7','2013-11-8')
-,(727,1,'avvist, venter ny deponering','2013-10-5','2016-9-18')
-,(106,1,'mottatt','2006-3-5','2008-2-7')
-,(701,2,'avtalt','2008-5-6','2010-1-19')
-,(1920,2,'avvist, venter ny deponering','2002-9-1','2006-3-20')
-,(5049,1,'avtalt','2003-9-11','2007-8-6');
+INSERT INTO doklager(filnavn,filstørrelse)
+VALUES ('Storfjord – Omasvuotna – Omasvuono.xml',1.1),
+('Modum.xml',1.1),
+('Rennesøy.xml',1.1),
+('Stryn.xml',1.1),
+('Gloppen.xml',1.1),
+('Steigen.xml',1.1),
+('Vestnes.xml',1.1),
+('Folldal.xml',1.1),
+('Klepp.xml',1.1),
+('Tjøme.xml',1.1),
+('Bærum.xml',1.1),
+('Arendal.xml',1.1),
+('Gjøvik.xml',1.1),
+('Klæbu.xml',1.1),
+('Harstad.xml',1.1),
+('Flesberg.xml',1.1),
+('Aukra.xml',1.1),
+('Solund.xml',1.1),
+('Holmestrand.xml',1.1),
+('Hitra.xml',1.1),
+('Skedsmo.xml',1.1),
+('Balestrand.xml',1.1),
+('Sør-Odal.xml',1.1),
+('Tolga.xml',1.1),
+('Arendal.xml',1.1),
+('Sogndal.xml',1.1),
+('Frosta.xml',1.1),
+('Skien.xml',1.1),
+('Loabák – Lavangen.xml',1.1),
+('Sør-Varanger.xml',1.1),
+('Tjeldsund.xml',1.1),
+('Snillfjord.xml',1.1),
+('Skien.xml',1.1),
+('Sørøysund.xml',1.1),
+('Hyllestad.xml',1.1),
+('Nome.xml',1.1),
+('Øvre Eiker.xml',1.1),
+('Meland.xml',1.1),
+('Flatanger.xml',1.1),
+('Aukra.xml',1.1);
+
+INSERT INTO arkivpakke(arkivskaper, ansvarlig, statusTekst, startDato, sluttDato, sistEndret, endretAv, dokfil)
+VALUES (1939,1,'godkjent','2003-6-10','2006-3-18',CURRENT_TIMESTAMP(),1,1),
+(623,1,'mottatt','2012-5-1','2015-4-24',CURRENT_TIMESTAMP(),1,2),
+(1142,2,'i dsm','2007-5-19','2008-8-8',CURRENT_TIMESTAMP(),1,3),
+(1449,1,'i dsm','2009-5-15','2016-10-4',CURRENT_TIMESTAMP(),1,4),
+(1445,1,'avtalt','2001-8-16','2009-3-11',CURRENT_TIMESTAMP(),1,5),
+(1848,2,'i karantene','2012-3-25','2013-8-26',CURRENT_TIMESTAMP(),2,6),
+(1535,2,'avtalt','2001-2-6','2015-11-11',CURRENT_TIMESTAMP(),1,7),
+(439,1,'avvist, venter ny deponering','2015-4-3','2017-5-16',CURRENT_TIMESTAMP(),1,8),
+(1120,1,'i test','2004-1-13','2009-1-5',CURRENT_TIMESTAMP(),1,9),
+(723,2,'i dsm','2003-10-17','2005-7-19',CURRENT_TIMESTAMP(),2,10),
+(219,2,'i karantene','2006-3-1','2015-7-24',CURRENT_TIMESTAMP(),2,11),
+(906,1,'i dsm','2003-7-26','2011-8-2',CURRENT_TIMESTAMP(),2,12),
+(502,1,'i dsm','2001-2-16','2007-10-20',CURRENT_TIMESTAMP(),1,13),
+(1662,2,'avtalt','2009-8-24','2013-8-19',CURRENT_TIMESTAMP(),1,14),
+(1903,2,'i test','2004-1-8','2017-10-24',CURRENT_TIMESTAMP(),1,15),
+(631,1,'avvist, venter ny deponering','2001-9-26','2006-10-4',CURRENT_TIMESTAMP(),2,16),
+(1547,2,'avvist, venter ny deponering','2001-8-19','2003-4-27',CURRENT_TIMESTAMP(),1,17),
+(1412,1,'i karantene','2000-6-5','2001-2-5',CURRENT_TIMESTAMP(),1,18),
+(715,1,'i dsm','2014-11-14','2015-7-11',CURRENT_TIMESTAMP(),2,19),
+(5013,1,'i karantene','2008-11-21','2015-7-10',CURRENT_TIMESTAMP(),1,20),
+(231,2,'mottatt','2000-11-14','2015-11-12',CURRENT_TIMESTAMP(),1,21),
+(1418,1,'mottatt','2010-3-27','2017-10-2',CURRENT_TIMESTAMP(),1,22),
+(419,1,'i test','2005-5-6','2011-11-4',CURRENT_TIMESTAMP(),2,23),
+(436,2,'avtalt','2007-10-20','2017-8-6',CURRENT_TIMESTAMP(),2,24),
+(906,1,'avvist, venter ny deponering','2015-7-28','2017-10-13',CURRENT_TIMESTAMP(),2,25),
+(1420,2,'mottatt','2000-2-24','2015-3-19',CURRENT_TIMESTAMP(),2,26),
+(5036,1,'godkjent','2007-9-18','2015-11-1',CURRENT_TIMESTAMP(),2,27),
+(806,1,'i dsm','2000-4-23','2012-6-3',CURRENT_TIMESTAMP(),2,28),
+(1920,2,'avtalt','2005-1-7','2017-7-3',CURRENT_TIMESTAMP(),1,29),
+(2030,1,'mottatt','2000-1-21','2005-11-11',CURRENT_TIMESTAMP(),1,30),
+(1852,1,'i test','2002-9-6','2009-3-17',CURRENT_TIMESTAMP(),2,31),
+(1613,1,'avvist, venter ny deponering','2011-1-17','2015-7-6',CURRENT_TIMESTAMP(),1,32),
+(806,2,'avtalt','2015-8-15','2016-11-20',CURRENT_TIMESTAMP(),1,33),
+(2016,1,'avtalt','2005-2-28','2014-9-3',CURRENT_TIMESTAMP(),1,34),
+(1413,2,'i karantene','2007-3-20','2015-2-3',CURRENT_TIMESTAMP(),2,35),
+(819,1,'avvist, venter ny deponering','2008-3-12','2016-7-19',CURRENT_TIMESTAMP(),1,36),
+(624,2,'i karantene','2006-7-3','2013-8-15',CURRENT_TIMESTAMP(),2,37),
+(1256,2,'avvist, venter ny deponering','2013-3-16','2014-7-16',CURRENT_TIMESTAMP(),1,38),
+(5049,2,'avtalt','2008-4-11','2013-9-13',CURRENT_TIMESTAMP(),1,39),
+(1547,1,'i dsm','2013-6-12','2017-10-17',CURRENT_TIMESTAMP(),1,40);
