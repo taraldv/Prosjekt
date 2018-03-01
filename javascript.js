@@ -103,41 +103,168 @@ function settInnAutentisertNavigering(fornavn,etternavn){
 	document.getElementById("arkivpakkeSøkNavigering").addEventListener("click",settInnArkivpakkeSøk);
 }
 
+function settInnArkivpakkeEndring(){
+	var parentNode = this.parentNode;
+	var arkivpakkeID = parentNode.getAttribute('data');
+	var children = parentNode.childNodes;
+	var selected = children[2].innerHTML;
+	//Setter inn arkivpakkeID på alle element id'er slik at de blir unike og flere kan endres samtidig.
+	httpPost(function(){
+		slettNode(document.getElementById("endreArkivpakkeRow"+arkivpakkeID));
+		var options = "";
+		var data = JSON.parse(this.response);
+		for (var key in data) {
+			if (data[key].statusTekst == selected) {
+				options += "<option selected>"+data[key].statusTekst+"</option>";
+			} else {
+				options += "<option>"+data[key].statusTekst+"</option>";
+			}
+			
+		}
+		var html = "<tr data='"+arkivpakkeID+"' id='endreArkivpakkeRow"+arkivpakkeID+"' class='endreArkivpakkeRow'>"
+		+"<td>Endre arkivpakke</td>"
+		+"<td><input type='text' id='endreArkivpakkeAnsvarlig"+arkivpakkeID+"' value='"+children[1].innerHTML+"'></td>"
+		+"<td><select id='endreArkivpakkeStatusSelect"+arkivpakkeID+"'>"+options+"</select></td>"
+		+"<td>"+children[3].innerHTML+"</td>"
+		+"<td><input type='text' id='endreArkivpakkeSluttDato"+arkivpakkeID+"' value='"+children[4].innerHTML+"'></td>"
+		+"<td colspan='3'><input type='file' id='endreArkivpakkeFil"+arkivpakkeID+"'></td>"
+		+"<td colspan='1' ><button id='endreArkivpakkeBekreft"+arkivpakkeID+"'>Bekreft</button></td>"
+		+"<td colspan='1' ><button id='endreArkivpakkeAvbryt"+arkivpakkeID+"'>Avbryt</button></td>"
+		+"</tr>";
+		parentNode.insertAdjacentHTML('afterend',html);
+		document.getElementById("endreArkivpakkeAvbryt"+arkivpakkeID).addEventListener("click",function(){
+			slettNode(document.getElementById("endreArkivpakkeRow"+arkivpakkeID));
+		});
+		document.getElementById("endreArkivpakkeBekreft"+arkivpakkeID).addEventListener("click",sendArkivpakkeEndring);
+	},"php/leggTilArkivpakke.php","statustype=statustype");
+}
+function sendArkivpakkeEndring(){
+	var parentNode = this.parentNode.parentNode;
+	var arkivpakkeID = parentNode.getAttribute('data');
+	var filInput = document.getElementById("endreArkivpakkeFil"+arkivpakkeID);
+	var fil = filInput.files[0];
+	var ansvarligInput = document.getElementById("endreArkivpakkeAnsvarlig"+arkivpakkeID);
+	var statusTekstSelect = document.getElementById("endreArkivpakkeStatusSelect"+arkivpakkeID);
+	var statusTekst = statusTekstSelect[statusTekstSelect.selectedIndex].value;
+	var sluttDatoInput = document.getElementById("endreArkivpakkeSluttDato"+arkivpakkeID);
+	httpPost(function(){
+		//Resetter validity
+		ansvarligInput.setCustomValidity("");
+		//startDatoInput.setCustomValidity("");
+		sluttDatoInput.setCustomValidity("");
+		//Regex som matcher 4 tall - 1 eller 2 tall - 1 eller 2 tall
+		var regex = /\d{4}-\d{1,2}-\d{1,2}/;  
+
+		//I stedet for regex som sjekker etter skuddår gjøres string om til dato
+		//Date.parse returnerer NaN hvis ugyldig
+		//var startDato = Date.parse(regex.exec(startDatoInput.value));
+		var sluttDato = Date.parse(regex.exec(sluttDatoInput.value));
+
+		//Må visst bruke formData for å sende fil uten en HTML form
+		var formData = new FormData();
+		formData.append("ansvarlig", ansvarligInput.value);
+		//formData.append("startDato", startDatoInput.value); 
+		formData.append("arkivID",arkivpakkeID);
+		formData.append("sluttDato", sluttDatoInput.value);
+		formData.append("statusTekst", statusTekst); 
+		formData.append("fil", fil);
+
+		//Sjekker om kommune og datoer er gyldige
+		if (JSON.parse(this.response).length>0 /*&& !isNaN(startDato) */&& !isNaN(sluttDato)) {
+			slettNode(document.getElementById("endreArkivpakkeRow"+arkivpakkeID));
+			httpPost(function(){
+				if (JSON.parse(this.response)==0){
+					console.log("oppdatering mislykket");
+				} else {
+					var oppdatertArkivpakke = JSON.parse(this.response);
+					var nyArkivpakkeTabellRadNode = arkivpakkeTabellRad(oppdatertArkivpakke[0]);
+					nyArkivpakkeTabellRadNode.className = "arkivpakkeRadEndret";
+					var tbody = document.getElementById("arkivpakkeTabellBody");
+					var gammelArkivpakkeTabellRadNode = document.getElementById("arkivpakkeRad"+arkivpakkeID);
+					tbody.replaceChild(nyArkivpakkeTabellRadNode,gammelArkivpakkeTabellRadNode);
+					document.getElementById("sokResultat").innerHTML = "Arkivpakke med id "+arkivpakkeID+" har blitt endret";
+					//slettNode(parentNode);
+				}
+			},"php/endreArkivpakke.php",formData,true);
+		};
+		if (JSON.parse(this.response)==0) {
+			ansvarligInput.setCustomValidity("Ugyldig bruker");
+		}
+		/*if (isNaN(startDato) || !regex.exec(startDatoInput.value)) {
+			startDatoInput.setCustomValidity("Ugyldig dato");
+		}*/
+		if (isNaN(sluttDato) || !regex.exec(sluttDatoInput.value)) {
+			sluttDatoInput.setCustomValidity("Ugyldig dato");
+		}
+		if (fil && fil.size>1000000) {
+			filInput.setCustomValidity("Fil for stor");
+		}
+	},"php/endreArkivpakke.php","validering=validering&ansvarlig="+ansvarligInput.value);
+}
+
 function settInnArkivpakkeOversikt(){
 	slettNode(document.getElementById("arkivpakkeTabell"));
 	var data = JSON.parse(this.response);
-	var html = "<table id='arkivpakkeTabell'><tr><th>Arkivskaper</th><th>Ansvarlig</th><th>Status</th>"
-	+"<th>Start dato</th><th>Slutt dato</th><th>Sist endret</th></tr>"
-	for (var key in data) {
-		html+="<tr><td>"+data[key].kommuneNavn+"</td>"
-		+"<td>"+data[key].brukerNavn+"</td>"
-		+"<td>"+data[key].statusTekst+"</td>"
-		+"<td>"+data[key].startDato+"</td>"
-		+"<td>"+data[key].sluttDato+"</td>"
-		+"<td>"+data[key].sistEndret+"</td>"
-		+"<td><a href='/php/hentFil.php?arkivID="+data[key].arkivID+"'>Fil</a></td>"
-		+"<td data='"+data[key].arkivID+"' class='logg'>Logg</td>"
-		+"<td data='"+data[key].arkivID+"' class='endre'>Endre</td>"
-		+"<td data='"+data[key].arkivID+"' class='slett'>Slett</td></tr>";
-	}
-	document.getElementById("innhold").insertAdjacentHTML('beforeend',html+="</table>");
-	var loggNodes = document.getElementsByClassName("logg");
-	var endreNodes = document.getElementsByClassName("endre");
-	var slettNodes = document.getElementsByClassName("slett");
-	//if (loggNodes.length == endreNodes.length && loggNodes.length == slettNodes.length && loggNodes) {
-		for(x=0;x<loggNodes.length;x++){
-			//loggNodes[x].addEventListener("click",slettArkivpakke);
-			//endreNodes[x].addEventListener("click",slettArkivpakke);
-			slettNodes[x].addEventListener("click",slettArkivpakke);
-		}
-	//}
 
+	//Setter inn en tom tabell med tittel for nesten hver kolonne
+	var html = "<table id='arkivpakkeTabell'><tbody id='arkivpakkeTabellBody'><tr><th>Arkivskaper</th><th>Ansvarlig</th><th>Status</th>"
+	+"<th>Start dato</th><th>Slutt dato</th><th>Sist endret</th></tr></tbody></table>"
+	document.getElementById("innhold").insertAdjacentHTML('beforeend',html);
+	var arkivpakkeTabellBodyNode = document.getElementById("arkivpakkeTabellBody");
+
+	//For hver key i data objektet lages en tr element ferdig utfylt som settes inn i tabellen
+	for (var key in data) {
+		arkivpakkeTabellBody.appendChild(arkivpakkeTabellRad(data[key]));
+	}
+}
+
+//Lager ett ferdig rad element som settes inn i tabell, brukes i arkivoversikt og arkivendring
+function arkivpakkeTabellRad(arkivpakkeObjekt){
+	var rad = document.createElement("tr");
+	rad.setAttribute("data",arkivpakkeObjekt.arkivID);
+	rad.id = "arkivpakkeRad"+arkivpakkeObjekt.arkivID;
+
+	//Lager td elementer med data fra de 6 første verdiene i objektet
+	var keys = Object.keys(arkivpakkeObjekt);
+	for (var i = 0; i < 6; i++) {
+		var tempTD = document.createElement("td");
+		tempTD.innerHTML = arkivpakkeObjekt[keys[i]];
+		rad.appendChild(tempTD);
+	}
+	
+	//td element med anchor som linker til nedlastning av arkivpakkefil
+	var filLink = document.createElement("a");
+	filLink.setAttribute("href","/php/hentFil.php?arkivID="+arkivpakkeObjekt.arkivID);
+	filLink.innerHTML = "Fil";
+	var filTD = document.createElement("td");
+	filTD.appendChild(filLink);
+	rad.appendChild(filTD);
+
+	var loggTD = document.createElement("td");
+	loggTD.className = "logg";
+	loggTD.innerHTML = "Logg";
+	//loggTD.addEventListener("click",settInnArkivpakkeEndring);
+	rad.appendChild(loggTD);
+
+	var endreTD = document.createElement("td");
+	endreTD.className = "endre";
+	endreTD.innerHTML = "Endre";
+	endreTD.addEventListener("click",settInnArkivpakkeEndring);
+	rad.appendChild(endreTD);
+
+	var slettTD = document.createElement("td");
+	slettTD.className = "slett";
+	slettTD.innerHTML = "Slett";
+	slettTD.addEventListener("click",slettArkivpakke);
+	rad.appendChild(slettTD);
+
+	return rad;
 }
 
 //Sender POST til arkivpakkeSlett.php med id fra valgt element og endrer elementet hvis raden blir slettet i databasen.
 function slettArkivpakke(){
-	var id = this.getAttribute("data");
 	var row = this.parentNode;
+	var id = row.getAttribute("data");
 	if (window.confirm("Er du sikker på sletting av arkivpakke?")) { 
 		httpPost(function(){
 			if (parseInt(this.response)==1) {
@@ -187,7 +314,7 @@ function settInnLeggTilArkivpakke(){
 		var html = "<div id='leggTilArkivpakkeDiv'><h2>Legg til ny arkivpakke</h2></br>"
 
 
-		+"<div class='form-horizontal' id='skjema' action='php/leggTilArkivpakke.php' method='POST'>"
+		+"<div class='form-horizontal' id='skjema'>"
 		//+"<form class='form-horizontal' id='skjema' action='php/leggTilArkivpakke.php' method='POST'>"
 
 		+"<div class='form-group'>"
@@ -218,7 +345,7 @@ function settInnLeggTilArkivpakke(){
 
 		+"<div class='form-group'>"       
 		+"<div class='col-sm-offset-2 col-sm-3'>"
-		+"<button id='leggTilArkivpakkeButton' type='submit' class='btn btn-primary'>Lagre</div></div>"
+		+"<button id='leggTilArkivpakkeButton' class='btn btn-primary'>Lagre</div></div>"
 		+"</div></div>";
 		document.getElementById("innhold").insertAdjacentHTML('beforeend',html);
 		document.getElementById("leggTilArkivpakkeButton").addEventListener("click",sendInnNyArkivpakke);
@@ -229,7 +356,6 @@ function settInnLeggTilArkivpakke(){
 function sendInnNyArkivpakke(){
 	var filInput = document.getElementById("arkivpakkeFilInput");
 	var fil = filInput.files[0];
-	console.log(fil);
 	var kommuneInput = document.getElementById("arkivpakkeKommuneInput");
 	var statusTekstSelect = document.getElementById("arkivpakkeStatusSelect")
 	var statusTekst = statusTekstSelect[statusTekstSelect.selectedIndex].value;
@@ -259,7 +385,9 @@ function sendInnNyArkivpakke(){
 		//Sjekker om kommune og datoer er gyldige
 		if (fil && JSON.parse(this.response).length>0 && !isNaN(startDato) && !isNaN(sluttDato)) {
 			slettNode(document.getElementById("leggTilArkivpakkeDiv"));
-			httpPost(function(){console.log(this.response)},"php/leggTilArkivpakke.php",formData,true);
+			httpPost(function(){
+				console.log(this.response)
+			},"php/leggTilArkivpakke.php",formData,true);
 		};
 		if (JSON.parse(this.response)==0) {
 			kommuneInput.setCustomValidity("Ugyldig kommune");
@@ -346,6 +474,7 @@ function httpPost(funksjon,url,parameter,boolean){
 	var xmlHttpRequest = new XMLHttpRequest();
 	xmlHttpRequest.addEventListener("load", funksjon);
 	xmlHttpRequest.open("POST", url);
+	//Hvis boolean er true så blir content-type header ikke lagt til
 	if(!boolean){
 		xmlHttpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	}
