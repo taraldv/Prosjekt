@@ -26,7 +26,7 @@ if (isset($_SESSION['brukernavn']) && isset($_POST['validering'])) {
 		if (!move_uploaded_file($_FILES['fil']['tmp_name'],"$dir$unikFilnavn")) {
 			die("Noe gikk galt med filopplastning, endring avbrutt");
 		} else {
-			$arkivpakkeQuery = 'UPDATE arkivpakke SET ansvarlig = ?, statusTekst = ?, sluttDato = ?, sistEndret = CURRENT_TIMESTAMP(), endretAv = ?, doklager = ? WHERE arkivID = ?';
+			$arkivpakkeQuery = 'UPDATE arkivpakke SET ansvarlig = ?, statusTekst = ?, sluttDato = ?, sistEndret = CURRENT_TIMESTAMP(), endretAv = ?, dokfil = ? WHERE arkivID = ?';
 			$array = array($ansvarligID[0]['brukerID'],$statusTekst,$sluttDato,$brukerID[0]['brukerID'],$dokID,$arkivID);
 			$type = 'issiii';
 		}
