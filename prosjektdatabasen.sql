@@ -629,3 +629,13 @@ VALUES (2019,1,'avtalt','2008-10-24','2013-4-25',CURRENT_TIMESTAMP(),2,1),
 (119,2,'i test','2004-8-20','2007-8-12',CURRENT_TIMESTAMP(),1,39),
 (1221,1,'i dsm','2000-1-13','2016-11-20',CURRENT_TIMESTAMP(),1,40);
 
+UPDATE arkivpakke SET statusTekst = 'avvist, venter ny deponering',endretAv = 1 WHERE arkivID = 1;
+UPDATE arkivpakke SET sluttDato = '2015-10-22',endretAv = 1 WHERE arkivID = 2;
+UPDATE arkivpakke SET statusTekst = 'avvist, venter ny deponering',endretAv = 1 WHERE arkivID = 3;
+UPDATE arkivpakke SET sluttDato = '2018-01-22',endretAv = 2 WHERE arkivID = 4;
+UPDATE arkivpakke SET sluttDato = '2016-01-01',endretAv = 2 WHERE arkivID = 2;
+UPDATE arkivpakke SET statusTekst = 'avtalt',endretAv = 1 WHERE arkivID = 2;
+UPDATE arkivpakke SET ansvarlig= 2,endretAv = 1 WHERE arkivID = 2;
+DELETE FROM arkivpakke where arkivID = 4;
+DELETE FROM arkivpakke where arkivID = 5;
+DELETE FROM arkivpakke where arkivID = 6;
