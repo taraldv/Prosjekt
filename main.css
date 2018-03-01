@@ -18,12 +18,12 @@ header{
 }
 #skjema {
 	background-color: #E2DDEC;
-padding: 2.5px;
+	padding: 2.5px;
 
 }
 #leggTilArkivpakkeButton {
-background-color: #00997a;
-border-style: none;
+	background-color: #00997a;
+	border-style: none;
 }
 
 #leggTilArkivpakkeDiv select,#leggTilArkivpakkeDiv input{
@@ -118,17 +118,17 @@ table{
 th{
 	padding: 5px;
 }
-tr{
+#arkivpakkeTabell tr{
 	border:1px solid black;
 }
-td{
+#arkivpakkeTabell td{
 	border-top: 1px solid black;
 	padding: 10px;
 }
-td:first-child,th:first-child{
+#arkivpakkeTabell td:first-child,th:first-child{
 	border-right: 1px solid black;
 }
-tr:nth-child(2n){
+#arkivpakkeTabell tr:nth-child(2n){
 	background-color: #DFDFDF;
 }
 .fil {
@@ -164,4 +164,22 @@ tr.endreArkivpakkeRow{
 }
 tr.arkivpakkeRadEndret {
 	background-color: rgba(255,255,130,0.3); 
+}
+#arkivpakkeLoggTabell tr{
+	border:0;
+	background-color: white;
+}
+#arkivpakkeLoggTabell,#arkivpakkeLoggTabell th{
+	border: 1px solid black;
+}
+#arkivpakkeLoggTabell th{
+	background-color: #DFDFDF;
+}
+#arkivpakkeLoggTabell td{
+	border-left: 1px solid black;
+	border-right: 1px solid black;
+	padding: 10px;
+}
+td.arkivpakkeLoggTabellSamling{
+	border-top: 1px solid black;
 }

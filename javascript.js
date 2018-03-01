@@ -103,6 +103,67 @@ function settInnAutentisertNavigering(fornavn,etternavn){
 	document.getElementById("arkivpakkeSøkNavigering").addEventListener("click",settInnArkivpakkeSøk);
 }
 
+function settInnArkivpakkeLogg(){
+	var parentNode = this.parentNode;
+	var arkivpakkeID = parentNode.getAttribute('data');
+	httpPost(function(){
+		var data = JSON.parse(this.response);
+		if (data.length==0) {
+			document.getElementById("sokResultat").innerHTML = "Arkivpakke med id "+arkivpakkeID+" har ingen logg";
+		} else {
+			tømInnhold();
+			//slettNode(document.getElementById("arkivpakkeTabell"));
+			var html = "<table id='arkivpakkeLoggTabell'><tbody><tr>"
+			+"<th>Arkivskaper</th>"
+			+"<th>Ansvarlig</th>"
+			+"<th>Status</th>"
+			+"<th>Start dato</th>"
+			+"<th>Slutt dato</th>"
+			+"<th>Sist endret</th>"
+			+"<th>Endret av</th>"
+			+"</tr>";
+			var arkivskaper = "";
+			var ansvarlig = "";
+			var statusTekst = "";
+			var startDato = "";
+			var sluttDato = "";
+			var endretAv = "";
+			
+			for (var i = 0; i < data.length; i++) {
+				html +="<tr>";
+				var tempObj = data[i];
+				
+				html += loggSammenligning(arkivskaper,tempObj.arkivskaper);
+				arkivskaper = tempObj.arkivskaper;
+
+				html += loggSammenligning(ansvarlig,tempObj.ansvarlig);
+				ansvarlig = tempObj.ansvarlig;
+
+				html += loggSammenligning(statusTekst,tempObj.statusTekst);
+				statusTekst = tempObj.statusTekst;
+
+				html += loggSammenligning(startDato,tempObj.startDato);
+				startDato = tempObj.startDato;
+
+				html += loggSammenligning(sluttDato,tempObj.sluttDato);
+				sluttDato = tempObj.sluttDato;
+
+				html += "<td class='arkivpakkeLoggTabellSamling'>"+tempObj.sistEndret+"</td>";
+				
+				html += loggSammenligning(endretAv,tempObj.endretAv);
+				endretAv = tempObj.endretAv;
+
+
+				html +="</tr>"
+
+				
+			}
+			html += "</tbody></table>";
+			document.getElementById("innhold").insertAdjacentHTML('beforeend',html);
+		}
+	},"php/arkivpakkeLogg.php","arkivID="+arkivpakkeID );
+}
+
 function settInnArkivpakkeEndring(){
 	var parentNode = this.parentNode;
 	var arkivpakkeID = parentNode.getAttribute('data');
@@ -174,7 +235,7 @@ function sendArkivpakkeEndring(){
 			slettNode(document.getElementById("endreArkivpakkeRow"+arkivpakkeID));
 			httpPost(function(){
 				if (JSON.parse(this.response)==0){
-					console.log("oppdatering mislykket");
+					document.getElementById("sokResultat").innerHTML = "Arkivpakke endring ble mislykket";
 				} else {
 					var oppdatertArkivpakke = JSON.parse(this.response);
 					var nyArkivpakkeTabellRadNode = arkivpakkeTabellRad(oppdatertArkivpakke[0]);
@@ -243,7 +304,7 @@ function arkivpakkeTabellRad(arkivpakkeObjekt){
 	var loggTD = document.createElement("td");
 	loggTD.className = "logg";
 	loggTD.innerHTML = "Logg";
-	//loggTD.addEventListener("click",settInnArkivpakkeEndring);
+	loggTD.addEventListener("click",settInnArkivpakkeLogg);
 	rad.appendChild(loggTD);
 
 	var endreTD = document.createElement("td");
@@ -508,4 +569,13 @@ function slettNode(node){
 function storBokstav(ord){
 	var stor = ord.charAt(0).toUpperCase();
 	return stor+ord.substring(1);
+}
+
+//Sender tilbake en top td element hvis objektene er like
+function loggSammenligning(objekt,tempObjekt){
+	if (objekt==tempObjekt) {
+		return "<td></td>";
+	} else {
+		return "<td class='arkivpakkeLoggTabellSamling'>"+tempObjekt+"</td>";
+	}
 }

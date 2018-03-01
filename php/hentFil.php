@@ -1,7 +1,7 @@
 <?php  
 require_once 'hjelpeFunksjoner.php';
 session_start();
-if(isset($_SESSION['brukernavn'])){
+if(isset($_SESSION['brukernavn'])&&isset($_GET['arkivID'])){
 	$query = 'SELECT d.filID,d.filnavn FROM arkivpakke a INNER JOIN doklager d ON a.dokfil = d.filID WHERE a.arkivID = ?';
 	$int = (int)$_GET['arkivID'];
 	$result = databaseKobling($query,'i',array($int));
@@ -16,5 +16,10 @@ if(isset($_SESSION['brukernavn'])){
 		header('Content-Length: ' . filesize($file));
 		readfile($file);
 	}
+} elseif (isset($_SESSION['brukernavn'])&&isset($_GET['filID'])) {
+	$query = 'SELECT filnavn FROM doklager WHERE filID = ?';
+	$int = (int)$_GET['filID'];
+	$result = databaseKobling($query,'i',array($int));
+	var_dump($result);
 }
 ?>
