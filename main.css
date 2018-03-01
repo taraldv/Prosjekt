@@ -118,17 +118,17 @@ table{
 th{
 	padding: 5px;
 }
-#arkivpakkeTabell tr{
+#arkivpakkeTabell tr,#kommuneSøkResultat tr{
 	border:1px solid black;
 }
-#arkivpakkeTabell td{
+#arkivpakkeTabell td,#kommuneSøkResultat td{
 	border-top: 1px solid black;
 	padding: 10px;
 }
-#arkivpakkeTabell td:first-child,th:first-child{
+#arkivpakkeTabell td:first-child,#arkivpakkeTabell th:first-child,#kommuneSøkResultat td:first-child,#kommuneSøkResultat th:first-child{
 	border-right: 1px solid black;
 }
-#arkivpakkeTabell tr:nth-child(2n){
+#arkivpakkeTabell tr:nth-child(2n),#kommuneSøkResultat tr:nth-child(2n){
 	background-color: #DFDFDF;
 }
 .fil {
@@ -182,4 +182,10 @@ tr.arkivpakkeRadEndret {
 }
 td.arkivpakkeLoggTabellSamling{
 	border-top: 1px solid black;
+}
+#antallArkivpakker button{
+	padding: 5px;
+}
+#antallArkivpakker p{
+	display: inline-block;
 }

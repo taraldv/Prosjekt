@@ -128,6 +128,7 @@ function settInnArkivpakkeLogg(){
 			var startDato = "";
 			var sluttDato = "";
 			var endretAv = "";
+			var dokfil = "";
 			
 			for (var i = 0; i < data.length; i++) {
 				html +="<tr>";
@@ -346,7 +347,7 @@ function arkivpakkeSøk(){
 }
 
 function settInnArkivpakkeSøk(antall) {
-	if (!antall || !Number.isInteger(antall)) {
+	if (!antall || !Number.isInteger(antall)){
 		antall = 10;
 	}
 	tømInnhold();
@@ -354,11 +355,27 @@ function settInnArkivpakkeSøk(antall) {
 	var html = "<p id='sokResultat'>Søk etter arkivpakke</p>"
 	+"<input id='arkivpakkeSøk' type='text' placeholder='Søk i arkivpakke database'>"
 	+"<button id='arkivpakkeSøkButton'>Søk</button>"
+	+"<div id='antallArkivpakker'>"
+	+"<p>Velg antall arkivpakker som vises</p>"
+	+"<button>10</button>"
+	+"<button>20</button>"
+	+"<button>50</button>"
+	+"</div>"
+	+"<button id='slettetArkivpakker'>Vis slettet arkivpakker</button>"
 	document.getElementById("innhold").insertAdjacentHTML('beforeend',html);
 	document.getElementById("arkivpakkeSøk").addEventListener("keyup", function(event){
 		if (event.key === "Enter") {
 			arkivpakkeSøk();
 		}
+	});
+	var antallArkivpakkerButtons = document.querySelectorAll("#antallArkivpakker button");
+	for (var i = 0; i < antallArkivpakkerButtons.length; i++) {
+		antallArkivpakkerButtons[i].addEventListener("click",function(){
+			settInnArkivpakkeSøk(parseInt(this.innerHTML));
+		})
+	}
+	document.getElementById("slettetArkivpakker").addEventListener("click",function(){
+		httpPost(settInnArkivpakkeOversikt,"php/oversikt.php","slettet=slettet");
 	});
 	document.getElementById("arkivpakkeSøkButton").addEventListener("click",arkivpakkeSøk);
 }
