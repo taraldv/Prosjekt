@@ -114,13 +114,14 @@ function settInnArkivpakkeLogg(){
 			tømInnhold();
 			//slettNode(document.getElementById("arkivpakkeTabell"));
 			var html = "<table id='arkivpakkeLoggTabell'><tbody><tr>"
+			+"<th>Sist endret</th>"
 			+"<th>Arkivskaper</th>"
 			+"<th>Ansvarlig</th>"
 			+"<th>Status</th>"
 			+"<th>Start dato</th>"
 			+"<th>Slutt dato</th>"
-			+"<th>Sist endret</th>"
 			+"<th>Endret av</th>"
+			+"<th>Fil</th>"
 			+"</tr>";
 			var arkivskaper = "";
 			var ansvarlig = "";
@@ -134,6 +135,8 @@ function settInnArkivpakkeLogg(){
 				html +="<tr>";
 				var tempObj = data[i];
 				
+				html += "<td class='arkivpakkeLoggTabellSamling'>"+tempObj.sistEndret+"</td>";
+
 				html += loggSammenligning(arkivskaper,tempObj.arkivskaper);
 				arkivskaper = tempObj.arkivskaper;
 
@@ -148,13 +151,17 @@ function settInnArkivpakkeLogg(){
 
 				html += loggSammenligning(sluttDato,tempObj.sluttDato);
 				sluttDato = tempObj.sluttDato;
-
-				html += "<td class='arkivpakkeLoggTabellSamling'>"+tempObj.sistEndret+"</td>";
 				
 				html += loggSammenligning(endretAv,tempObj.endretAv);
 				endretAv = tempObj.endretAv;
 
-
+				if (dokfil==tempObj.dokfil) {
+					html += "<td></td>";
+				} else {
+					html += "<td class='arkivpakkeLoggTabellSamling'>"+tempObj.dokfil+"</td>";
+				}
+				dokfil = tempObj.dokfil;
+				
 				html +="</tr>"
 
 				
