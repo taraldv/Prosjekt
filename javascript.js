@@ -316,6 +316,7 @@ function sendInnNyArkivpakke(){
 	var startDatoInput = document.getElementById("arkivpakkeStartDatoInput");
 	var sluttDatoInput = document.getElementById("arkivpakkeSluttDatoInput");
 	httpPost(function(){
+		var data = JSON.parse(this.response);
 		//Resetter validity
 		kommuneInput.setCustomValidity("");
 		startDatoInput.setCustomValidity("");
@@ -337,13 +338,13 @@ function sendInnNyArkivpakke(){
 		formData.append("fil", fil);
 
 		//Sjekker om kommune og datoer er gyldige
-		if (fil && JSON.parse(this.response).length>0 && !isNaN(startDato) && !isNaN(sluttDato)) {
+		if (fil && data.validering==1 && !isNaN(startDato) && !isNaN(sluttDato)) {
 			slettNode(document.getElementById("leggTilArkivpakkeDiv"));
 			httpPost(function(){
 				console.log(this.response)
 			},"php/leggTilArkivpakke.php",formData,true);
 		};
-		if (JSON.parse(this.response)==0) {
+		if (data.validering==0) {
 			kommuneInput.setCustomValidity("Ugyldig kommune");
 		}
 		if (isNaN(startDato) || !regex.exec(startDatoInput.value)) {

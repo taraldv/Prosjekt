@@ -84,8 +84,27 @@ CREATE TABLE logg (
 
 DROP TRIGGER IF EXISTS arkivpakkeARD;
 DROP TRIGGER IF EXISTS arkivpakkeARU;
+DROP FUNCTION IF EXISTS kommuneEksisterer;
 
 DELIMITER ::
+
+CREATE FUNCTION kommuneEksisterer(p_kommunenavn VARCHAR(100))
+	RETURNS BOOLEAN
+	READS SQL DATA
+BEGIN
+	DECLARE p_eksisterer BOOLEAN;
+	DECLARE v_resultat INT;
+	SELECT 1 INTO v_resultat
+	FROM kommune
+	WHERE kommunenavn = p_kommunenavn;
+
+	IF v_resultat = 1 THEN
+		SET p_eksisterer = TRUE;
+	ELSE
+		SET p_eksisterer = FALSE;
+	END IF;	
+	RETURN p_eksisterer;
+END::
 
 CREATE TRIGGER arkivpakkeARU
 AFTER UPDATE ON arkivpakke

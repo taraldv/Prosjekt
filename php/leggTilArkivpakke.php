@@ -2,12 +2,13 @@
 require_once 'hjelpeFunksjoner.php';
 session_start();
 if (isset($_SESSION['brukernavn']) && isset($_POST['statustype'])){
-	$result = databaseKoblingUtenParam('select * from statustype');
+	$result = databaseKoblingUtenParam('SELECT * FROM statustype');
 	echo json_encode($result);
 } elseif (isset($_SESSION['brukernavn']) && isset($_POST['validering'])) {
-	$query = 'SELECT 1 FROM kommune WHERE kommunenavn = ?';
+	//$query = 'SELECT 1 FROM kommune WHERE kommunenavn = ?';
+	$query = 'SELECT kommuneEksisterer(?) AS validering;';
 	$result = databaseKobling($query,'s',array($_POST['kommune']));
-	echo json_encode($result);
+	echo json_encode($result[0]);
 } elseif (isset($_SESSION['brukernavn'])&&$_FILES) {
 	$filnavn = $_FILES['fil']['name'];
 	$filstr = $_FILES['fil']['size']/1000;
