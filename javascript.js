@@ -45,10 +45,10 @@ function lesURL(){
 
 //Setter inn inlogging form i 'loginRight' div
 function settInnInnlogging(){
-	var html = "<form action='php/inlogging.php' method='POST'>"
+	var html = "<form action='php/inlogging.php' method='POST' id='innlogging'>"
 	+"<input id='brukernavn' type='text' name='brukernavn' placeholder='Brukernavn' required>"
 	+"<input id='passord' type='password' name='passord' placeholder='Passord' required>"
-	+"<button type='submit'>Logg inn</button></form></div>";
+	+"<button type='submit' class='btn btn-default'><span class='glyphicon glyphicon-log-in'></span>Logg inn</button></form></div>";
 	document.getElementById("loginRight").insertAdjacentHTML('afterbegin', html);
 }
 
@@ -68,9 +68,18 @@ function kommuneSøk(){
 //Legger inn input og knapp som starter søket i 'innhold' div
 function settInnKommuneSøk(){
 	tømInnhold();
-	var html = "<p>Søk etter antall deponeringer i en kommune</p>"
-	+ "<input id='KommuneSøkInput' type='text' placeholder='Kommunenavn'>"
-	+ "<button id='KommuneSøkButton'>Søk</button>";
+	var html = "<div class='jumbotron text-center'>"
+  +"<h2>Har vi arkivert det du er ute etter?</h2>"
+    +"<p>Søk kommune</p>"
+    +"<div class='form-group'>"
+    +"<div class='col-sm-6'>"
+      +"<input id='KommuneSøkInput' type='text' class='form-control input-md' placeholder='Kommune' class='form-control' size='50'>"
+        +"<button id='KommuneSøkButton' type='button' class='btn btn-default'><span class='glyphicon glyphicon-search'> SØK</span></button>"
+      	+"</div>"
+    +"</div>"
++"</div>";
+
+
 	document.getElementById("innhold").insertAdjacentHTML('beforeend', html);
 	//Gjør at enter kan brukes til å starte søket
 	document.getElementById("KommuneSøkInput").addEventListener("keyup", function(event){
@@ -86,16 +95,15 @@ function settInnAutentisertNavigering(fornavn,etternavn){
 	var loginRight = document.getElementById("loginRight");
 	var loginLeft = document.getElementById("loginLeft");
 
-	var loginRightHTML = "<p>"+fornavn+" "+etternavn+"</p>"
-	+"<button id='endrePassordButton' type='button'>Endre passord</button>"
+	var loginRightHTML = "<p id='brukeren'>	<span class='glyphicon glyphicon-user'></span>"+fornavn+" "+etternavn+"</p>"
+	+"<button id='endrePassordButton' type='button' class='btn btn-default'><span class='glyphicon glyphicon-pencil'></span>Endre passord</button>"
 	+"<form action='php/utlogging.php' method='POST'>"
-	+ "<button type='submit'>Logg ut</button>"
+	+ "<button id='loggUt' type='submit' class='btn btn-default'><span class='glyphicon glyphicon-log-out'></span>Logg ut</button>"
 	+ "</form>";
 	loginRight.insertAdjacentHTML('afterbegin', loginRightHTML);
 	document.getElementById("endrePassordButton").addEventListener("click",settInnPassordEndring);
-
-	var loginLeftHTML = "<button id='arkivpakkeSøkNavigering'>Søk i arkivpakker</button>"
-	+"<button id='leggTilArkivpakkeNavigering'>Legg til ny arkivpakke</button>"
+	var loginLeftHTML = "<button id='arkivpakkeSøkNavigering' class='btn btn-default'><span class='glyphicon glyphicon-search'></span>Søk i arkivpakker</button>"
+	+"<button id='leggTilArkivpakkeNavigering' class='btn btn-default'><span class='glyphicon glyphicon-plus'></span>Legg til ny arkivpakke</button>"
 	loginLeft.insertAdjacentHTML('afterbegin',loginLeftHTML);
 	document.getElementById("leggTilArkivpakkeNavigering").addEventListener("click",settInnLeggTilArkivpakke);
 	document.getElementById("arkivpakkeSøkNavigering").addEventListener("click",settInnArkivpakkeSøk);
@@ -428,7 +436,7 @@ function settInnLeggTilArkivpakke(){
 
 		+"<div class='form-group'>"       
 		+"<div class='col-sm-offset-2 col-sm-3'>"
-		+"<button id='leggTilArkivpakkeButton' class='btn btn-primary'>Lagre</div></div>"
+		+"<button id='leggTilArkivpakkeButton' class='btn btn-default'>Lagre</div></div>"
 		+"</div></div>";
 		document.getElementById("innhold").insertAdjacentHTML('beforeend',html);
 		document.getElementById("leggTilArkivpakkeButton").addEventListener("click",sendInnNyArkivpakke);
@@ -496,7 +504,7 @@ function settInnPassordEndring(){
 	tømInnhold();
 	var html = "<input id='gammeltPassord' type=password required placeholder='Gammelt passord'>"
 	+"<input id='nyttPassord' type=password required placeholder='Nytt passord'>"
-	+"<button id='oppdaterPassordButton'>Endre passord</button>";
+	+"<button id='oppdaterPassordButton' class='btn btn-default'>Endre passord</button>";
 	document.getElementById("innhold").insertAdjacentHTML('beforeend', html);
 	var gammeltPassord = document.getElementById("gammeltPassord");
 
