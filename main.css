@@ -7,6 +7,7 @@
 body{
 	background-color: #F8F8F8;
 	text-align: center;
+
 }
 header{
 	position: relative;
@@ -15,15 +16,53 @@ header{
 	text-align: center;
 	font-size: 3em;
 	box-shadow: 0px 1px 5px 3px #BFBFBF;
+	background-color: #23282e;
+	color:#00b3b3;
 }
-#skjema {
-	background-color: #E2DDEC;
-	padding: 2.5px;
+
+button:hover{
+	background-color: #008080 !important;
+	transition:0.3s;
+	color: #e1ffff  !important;
+}
+.btn{
+	color: #e1ffff;
+	background-color: #00b3b3;
+	color: #e1ffff;
+	border: none;
+	margin:0;
+	margin-right: 1px; 
+}
+
+span {
+	margin:3px;
+}
+#arkivpakkeSøkNavigering{
+	height: 49px;
+	background-color: #8C94A8;
 
 }
-#leggTilArkivpakkeButton {
-	background-color: #00997a;
-	border-style: none;
+#leggTilArkivpakkeNavigering{
+	height: 49px;
+	background-color: #8C94A8;
+
+}
+#endrePassordButton{
+	height: 49px;
+	background-color: #8C94A8;
+
+}
+#loggUt {
+	height: 49px;
+	background-color: #8C94A8;
+}
+#oppdaterPassordButton{
+	margin-top: 5px;
+}
+#skjema {
+	background-color: #EDEDEE;
+	padding: 2.5px;
+
 }
 
 #leggTilArkivpakkeDiv select,#leggTilArkivpakkeDiv input{
@@ -38,7 +77,6 @@ header{
 	border-left: 1px solid #CCCCCC;
 	border-right: 1px solid #CCCCCC;
 	border-bottom: 1px solid #CCCCCC;
-	padding-top: 10px;
 	position: relative;
 	z-index: 1;
 	display: inline-block;
@@ -47,11 +85,15 @@ header{
 	margin: auto;
 	background-color: white;
 }
+#innlogging{
+	margin:5px;
+}
 #login{
-	margin-top: 15px;
-	margin-bottom: 15px;
+	height: 50px;
+	margin-top: 0px;
 	box-sizing: border-box;
 	border-bottom: 1px solid #CCCCCC;
+	background-color: #8C94A8;
 }
 #loginRight form{
 	display: inline-block;
@@ -162,6 +204,9 @@ tr.endreArkivpakkeRow{
 .endreArkivpakkeRow input[type="text"]{
 	width: 100px;
 }
+#arkivpakkeLoggTabell{
+	margin-top: 50px;
+}
 #arkivpakkeTabell tr.arkivpakkeRadEndret {
 	background-color: rgba(255,255,130,0.3); 
 }
@@ -188,4 +233,16 @@ td.arkivpakkeLoggTabellSamling{
 }
 #antallArkivpakker p{
 	display: inline-block;
+}
+.col-sm-6{
+	margin-left: 140px;
+}
+.jumbotron {
+	margin-top: 50px;
+	margin-left: 280px;
+	width:50%;
+	height: 260px;
+}
+#brukeren{
+	color:#e1ffff;
 }
