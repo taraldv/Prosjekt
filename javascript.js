@@ -95,11 +95,9 @@ function settInnAutentisertNavigering(fornavn,etternavn){
 	document.getElementById("endrePassordButton").addEventListener("click",settInnPassordEndring);
 
 	var loginLeftHTML = "<button id='arkivpakkeSøkNavigering'>Søk i arkivpakker</button>"
-	+"<button id='kommuneSøkNavigering'>Søk i kommuner</button>"
 	+"<button id='leggTilArkivpakkeNavigering'>Legg til ny arkivpakke</button>"
 	loginLeft.insertAdjacentHTML('afterbegin',loginLeftHTML);
 	document.getElementById("leggTilArkivpakkeNavigering").addEventListener("click",settInnLeggTilArkivpakke);
-	document.getElementById("kommuneSøkNavigering").addEventListener("click",settInnKommuneSøk);
 	document.getElementById("arkivpakkeSøkNavigering").addEventListener("click",settInnArkivpakkeSøk);
 }
 
