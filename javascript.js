@@ -367,7 +367,7 @@ function settInnArkivpakkeSøk(antall) {
 	httpPost(settInnArkivpakkeOversikt,"php/oversikt.php","antall="+antall);
 	var html = "<p id='sokResultat'>Søk etter arkivpakke</p>"
 	+"<input id='arkivpakkeSøk' type='text' placeholder='Søk i arkivpakke database'>"
-	+"<button id='arkivpakkeSøkButton'>Søk</button>"
+	+"<button id='arkivpakkeSøkButton' class='btn btn-default'>Søk</button>"
 	+"<div id='antallArkivpakker'>"
 	+"<p>Velg antall arkivpakker som vises</p>"
 	+"<button>10</button>"
