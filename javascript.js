@@ -365,6 +365,7 @@ function sendInnNyArkivpakke(){
 //Tar imot data i JSON form fra php og sletter den gamle tabellen hvis den finnes, så lages en ny tabell med data og settes inn.
 function settInnArkivpakkeOversikt(){
 	slettNode(document.getElementById("arkivpakkeTabell"));
+	slettNode(document.getElementById("antallSøkResultater"));
 	var data = JSON.parse(this.response);
 
 	//Setter inn en tom tabell med tittel for nesten hver kolonne
@@ -377,6 +378,7 @@ function settInnArkivpakkeOversikt(){
 	for (var key in data) {
 		arkivpakkeTabellBody.appendChild(arkivpakkeTabellRad(data[key]));
 	}
+	document.getElementById("innhold").insertAdjacentHTML('beforeend',"<p id='antallSøkResultater'>viser "+data.length+" resultater</p>");
 }
 
 //Lager ett ferdig rad element som settes inn i tabell, brukes i arkivoversikt og arkivendring
