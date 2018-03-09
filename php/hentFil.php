@@ -16,10 +16,5 @@ if(isset($_SESSION['brukernavn'])&&isset($_GET['arkivID'])){
 		header('Content-Length: ' . filesize($file));
 		readfile($file);
 	}
-} elseif (isset($_SESSION['brukernavn'])&&isset($_GET['filID'])) {
-	$query = 'SELECT filnavn FROM doklager WHERE filID = ?';
-	$int = (int)$_GET['filID'];
-	$result = databaseKobling($query,'i',array($int));
-	var_dump($result);
 }
 ?>
