@@ -4,7 +4,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentHTML
 https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
 https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
 */
-lesURL();
+
 
 //Funksjon som først sjekker om bruker har mislykket en inlogging.
 //Så sjekkes om bruker inlogget og skal se autorisert navigering eller vanlig index.
@@ -24,7 +24,7 @@ function lesURL(){
 		}
 
 	//Hvis try blokken ikke fungerer så sjekkes det om bruker har en session eller ikke
-	} catch (TypeError){
+} catch (TypeError){
 		//Sender en POST uten parameter til sessionSjekk.php
 		httpPost(function(){
 			//Responsen fra php er brukernavn: $brukernavn i JSON format hvis session eksisterer.
@@ -43,14 +43,20 @@ function lesURL(){
 	}
 }
 
-//Setter inn inlogging form i 'loginRight' div
-function settInnInnlogging(){
-	var html = "<form action='php/inlogging.php' method='POST' id='innlogging'>"
-	+"<input id='brukernavn' type='text' name='brukernavn' placeholder='Brukernavn' required>"
-	+"<input id='passord' type='password' name='passord' placeholder='Passord' required>"
-	+"<button type='submit' class='btn btn-default'><span class='glyphicon glyphicon-log-in'></span>Logg inn</button></form></div>";
-	document.getElementById("loginRight").insertAdjacentHTML('afterbegin', html);
+//Etter php er ferdig kjørt knyttes knappene til funksjoner
+window.onload = function(){
+	var endrePassordButton = document.getElementById("endrePassordButton");
+	var leggTilArkivpakkeNavigering = document.getElementById("leggTilArkivpakkeNavigering");
+	var arkivpakkeSøkNavigering = document.getElementById("arkivpakkeSøkNavigering");
+	if (endrePassordButton && leggTilArkivpakkeNavigering && arkivpakkeSøkNavigering) {
+		endrePassordButton.addEventListener("click",settInnPassordEndring);
+		leggTilArkivpakkeNavigering.addEventListener("click",settInnLeggTilArkivpakke);
+		arkivpakkeSøkNavigering.addEventListener("click",settInnArkivpakkeSøk);
+	}
 }
+
+
+
 
 //Sender POST til kommuneSok.php med tekst fra 'KommuneSøkInput' input og
 //setter inn resultatet i en tabell i 'innhold' div
@@ -88,25 +94,6 @@ function settInnKommuneSøk(){
 		}
 	});
 	document.getElementById("KommuneSøkButton").addEventListener("click",kommuneSøk);
-}
-
-//Legger inn navigering til en bruker som har logget inn
-function settInnAutentisertNavigering(fornavn,etternavn){
-	var loginRight = document.getElementById("loginRight");
-	var loginLeft = document.getElementById("loginLeft");
-
-	var loginRightHTML = "<p id='brukeren'>	<span class='glyphicon glyphicon-user'></span>"+fornavn+" "+etternavn+"</p>"
-	+"<button id='endrePassordButton' type='button' class='btn btn-default'><span class='glyphicon glyphicon-pencil'></span>Endre passord</button>"
-	+"<form action='php/utlogging.php' method='POST'>"
-	+ "<button id='loggUt' type='submit' class='btn btn-default'><span class='glyphicon glyphicon-log-out'></span>Logg ut</button>"
-	+ "</form>";
-	loginRight.insertAdjacentHTML('afterbegin', loginRightHTML);
-	document.getElementById("endrePassordButton").addEventListener("click",settInnPassordEndring);
-	var loginLeftHTML = "<button id='arkivpakkeSøkNavigering' class='btn btn-default'><span class='glyphicon glyphicon-search'></span>Søk i arkivpakker</button>"
-	+"<button id='leggTilArkivpakkeNavigering' class='btn btn-default'><span class='glyphicon glyphicon-plus'></span>Legg til ny arkivpakke</button>"
-	loginLeft.insertAdjacentHTML('afterbegin',loginLeftHTML);
-	document.getElementById("leggTilArkivpakkeNavigering").addEventListener("click",settInnLeggTilArkivpakke);
-	document.getElementById("arkivpakkeSøkNavigering").addEventListener("click",settInnArkivpakkeSøk);
 }
 
 //Setter inn logg til valgt arkivpakke
@@ -621,7 +608,7 @@ function slettChildren(node){
 function tømInnhold(){
 	var list = document.getElementById("innhold").childNodes;
 	var keys = Object.keys(list);
-	for (var i = keys.length - 1; i > 0; i--) {
+	for (var i = keys.length - 1; i > 1; i--) {
 		slettNode(list[keys[i]]);
 	}
 }
