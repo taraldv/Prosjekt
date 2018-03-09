@@ -317,10 +317,6 @@ function sendInnNyArkivpakke(){
 	var sluttDatoInput = document.getElementById("arkivpakkeSluttDatoInput");
 	httpPost(function(){
 		var data = JSON.parse(this.response);
-		//Resetter validity
-		kommuneInput.setCustomValidity("");
-		startDatoInput.setCustomValidity("");
-		sluttDatoInput.setCustomValidity("");
 		//Regex som matcher 4 tall - 1 eller 2 tall - 1 eller 2 tall
 		var regex = /\d{4}-\d{1,2}-\d{1,2}/;  
 
@@ -344,15 +340,9 @@ function sendInnNyArkivpakke(){
 				console.log(this.response)
 			},"php/leggTilArkivpakke.php",formData,true);
 		};
-		if (data.validering==0) {
-			kommuneInput.setCustomValidity("Ugyldig kommune");
-		}
-		if (isNaN(startDato) || !regex.exec(startDatoInput.value)) {
-			startDatoInput.setCustomValidity("Ugyldig dato");
-		}
-		if (isNaN(sluttDato) || !regex.exec(sluttDatoInput.value)) {
-			sluttDatoInput.setCustomValidity("Ugyldig dato");
-		}
+		inputValidering(kommuneInput,data.validering==0,"Ugyldig kommune");
+		inputValidering(startDatoInput,isNaN(startDato) || !regex.exec(startDatoInput.value),"Ugyldig dato");
+		inputValidering(sluttDatoInput,isNaN(sluttDato) || !regex.exec(sluttDatoInput.value),"Ugyldig dato");
 		if (!fil) {
 			filInput.setCustomValidity("Fil ikke valgt");
 		} else if (fil.size>1000000) {
@@ -479,7 +469,7 @@ function settInnArkivpakkeSøk(antall) {
 	+"</div>"
 	+"<button id='slettetArkivpakker'>Vis slettet arkivpakker</button>"
 	document.getElementById("innhold").insertAdjacentHTML('beforeend',html);
-		
+
 	//Knytter 'arkivpakkeSøk' input til en eventListener som kjører funksjonen 'arkivpakkeSøk' når Enter trykkes
 	document.getElementById("arkivpakkeSøk").addEventListener("keyup", function(event){
 		if (event.key === "Enter") {
@@ -517,19 +507,19 @@ function settInnLeggTilArkivpakke(){
 		for (var key in data) {
 			options += "<option>"+data[key].statusTekst+"</option>";
 		}
-			var html = "<div id='leggTilArkivpakkeDiv'><h2>Legg til ny arkivpakke</h2></br>"
+		var html = "<div id='leggTilArkivpakkeDiv'><h2>Legg til ny arkivpakke</h2></br>"
 
 		+"<div class='form-horizontal' id='skjema'>"
 	//+"<form class='form-horizontal' id='skjema' action='php/leggTilArkivpakke.php' method='POST'>"
-		+"<div class='form-group'>"
+	+"<div class='form-group'>"
 	+"<label class='control-label col-sm-3' for='arkivpakkeFilInput'>Last opp METSFIL</label>"
 	+"<div class='col-sm-3'>"
 	+"<input type='file' id='arkivpakkeFilInput'></div></div>"
-		+"<div class='form-group'>"
+	+"<div class='form-group'>"
 	+"<label class='control-label col-sm-3' for='arkivpakkeKommuneInput'>Arkivskaper:</label>"
-	+"<div class='col-sm-3'>"
+	+"<div class='col-sm-3' >"
 	+"<input type='text' class='form-control' id='arkivpakkeKommuneInput' placeholder='Kommune'></div></div>"
-		+"<div class='form-group'>"
+	+"<div class='form-group'>"
 	+"<label class='control-label col-sm-3' for='arkivpakkeStatusSelect'>Status:</label>"
 	+"<div class='col-sm-3'>"
 	+"<select class='form-control' id='arkivpakkeStatusSelect'>"+options+"</select>"
@@ -543,13 +533,13 @@ function settInnLeggTilArkivpakke(){
 	+"<label class='control-label col-sm-3' for='arkivpakkeSluttDatoInput'>Gyldig sluttdato: åååå-mm-dd</label>"
 	+"<div class='col-sm-3'>"
 	+"<input type='text' class='form-control' id='arkivpakkeSluttDatoInput' placeholder='Slutt dato'></div></div>"
-		+"<div class='form-group'>"       
+	+"<div class='form-group'>"       
 	+"<div class='col-sm-offset-2 col-sm-3'>"
 	+"<button id='leggTilArkivpakkeButton' class='btn btn-default'>Lagre</div></div>"
 	+"</div></div>";
 	document.getElementById("innhold").insertAdjacentHTML('beforeend',html);
 	document.getElementById("leggTilArkivpakkeButton").addEventListener("click",sendInnNyArkivpakke);
-	},"php/leggTilArkivpakke.php","statustype=statustype");
+},"php/leggTilArkivpakke.php","statustype=statustype");
 }
 
 
@@ -663,5 +653,14 @@ function loggSammenligning(objekt,tempObjekt){
 		return "<td></td>";
 	} else {
 		return "<td class='arkivpakkeLoggTabellSamling'>"+tempObjekt+"</td>";
+	}
+}
+
+function inputValidering(inputNode,boolean,errorTekst){
+	inputNode.setCustomValidity("");
+	inputNode.parentNode.classList.remove("has-error");
+	if (boolean) {
+		inputNode.setCustomValidity(errorTekst);
+		inputNode.parentNode.classList.add("has-error");
 	}
 }
