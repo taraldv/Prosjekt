@@ -543,7 +543,6 @@ function settInnLeggTilArkivpakke(){
 
 
 //Setter inn html for passord endring og legger til eventListeners slik at 'Enter' starter funksjonen 'oppdaterPassord'
-//'gammeltPassord' input for også en eventListener på 'focusout' som sjekker validity
 function settInnPassordEndring(){
 	tømInnhold();
 	var html = "<input id='gammeltPassord' type=password required placeholder='Gammelt passord'>"
@@ -563,12 +562,6 @@ function settInnPassordEndring(){
 			oppdaterPassord();
 		}
 	}
-
-	//EventListener som kjører hvis input mister fokus.
-	gammeltPassord.addEventListener("focusout", function(){
-		//Sjekker om gammelt passord er godkjent
-		endrePassordValidity(this.value);
-	});
 
 }
 
