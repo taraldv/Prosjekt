@@ -6,7 +6,6 @@ $query = 'SELECT * FROM bruker WHERE brukernavn= ?';
 $param = array($brukernavn);
 $result = databaseKobling($query,'s',$param);
 $hash = $result[0]['passord'];
-
 if (password_verify($passord, $hash)) {
 	session_start();
 	$_SESSION['brukernavn'] = $brukernavn;

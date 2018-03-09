@@ -6,43 +6,6 @@ https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest
 */
 
 
-//Funksjon som først sjekker om bruker har mislykket en inlogging.
-//Så sjekkes om bruker inlogget og skal se autorisert navigering eller vanlig index.
-function lesURL(){
-	slettNode(document.getElementById("javascript"));
-
-	//Mislykket inlogging har ?error i url og denne try blokken fungerer.
-	try{
-		var urlQuery = document.URL.split("?")[1];
-		if(urlQuery.indexOf("error")>=0){
-			document.getElementById("loginLeft").insertAdjacentHTML('beforeend',"<p class='red'>Feil passord eller brukernavn</p>");
-			settInnInnlogging();
-			settInnKommuneSøk();
-
-			//Endrer url slik at bruker ikke ser ?error
-			window.history.pushState("", "", "index.html");
-		}
-
-	//Hvis try blokken ikke fungerer så sjekkes det om bruker har en session eller ikke
-} catch (TypeError){
-		//Sender en POST uten parameter til sessionSjekk.php
-		httpPost(function(){
-			//Responsen fra php er brukernavn: $brukernavn i JSON format hvis session eksisterer.
-			if (this.response.length>0) {
-				var data = JSON.parse(this.response);
-				var fornavn = storBokstav(data.fornavn);
-				var etternavn = storBokstav(data.etternavn);
-
-				settInnAutentisertNavigering(fornavn,etternavn);
-				settInnArkivpakkeSøk();
-			} else {
-				settInnInnlogging();
-				settInnKommuneSøk();
-			}
-		},"php/sessionSjekk.php","");
-	}
-}
-
 //Etter php er ferdig kjørt knyttes knappene til funksjoner
 window.onload = function(){
 	var endrePassordButton = document.getElementById("endrePassordButton");
@@ -54,8 +17,6 @@ window.onload = function(){
 		arkivpakkeSøkNavigering.addEventListener("click",settInnArkivpakkeSøk);
 	}
 }
-
-
 
 
 //Sender POST til kommuneSok.php med tekst fra 'KommuneSøkInput' input og
