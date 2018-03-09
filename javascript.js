@@ -513,10 +513,7 @@ function settInnLeggTilArkivpakke(){
 			+"<div class='form-group'>"
 				+"<label class='control-label col-sm-3' for='arkivpakkeFilInput'>Last opp METSFIL</label>"
 				+"<div class='col-sm-3'>"
-					+"<label class='custom-file'>"
-  					+"<input type='file' id='arkivpakkeFilInput' class='custom-file-input'>"
- 					+"<span class='custom-file-control'></span>"
-					+"</label>"
+					+"<input type='file' class='form-control-file' id='arkivpakkeFilInput'>"
 				+"</div>"
 			+"</div>"
 		+"<div class='form-group'>"
@@ -578,14 +575,26 @@ function settInnPassordEndring(){
 
 }
 
-//Sender POST til endrePassord.php hvis begge input er valid
+//Sjekker først om gammelt passord er korrekt, hvis korrekt sendes oppdateres passord
 function oppdaterPassord(){
 	var nyttPassordInput = document.getElementById("nyttPassord");
 	var gammeltPassordInput = document.getElementById("gammeltPassord");
-	//Sjekker om gammelt passord er godkjent
-	endrePassordValidity(gammeltPassordInput.value);
+
+	//Sender gammelt passord til endrePassord.php for å sjekke om det er korrekt 
+	//(svar fra php er enten 1 eller 0) og endrer input sin validity
+	httpPost(function(){
+		var inputField = document.getElementById("gammeltPassord");
+		if (parseInt(this.response)==1) {
+			inputField.setCustomValidity("");
+		} else {
+			inputField.setCustomValidity("Matcher ikke gammelt passord");
+		}
+	},"php/endrePassord.php","gammeltPassord="+gammeltPassordInput.value);
+
 	//Sjekker om input er valid
 	if(gammeltPassordInput.checkValidity() && nyttPassordInput.checkValidity()){
+
+		//Sender gammelt passord for godkjenning og det nye passordet
 		httpPost(function(){
 			if (parseInt(this.response)==1){
 				tømInnhold();
@@ -595,17 +604,6 @@ function oppdaterPassord(){
 			}
 		},"php/endrePassord.php","nyttPassord="+nyttPassordInput.value+"&gammeltPassord="+gammeltPassordInput.value);
 	}
-}
-
-function endrePassordValidity(passord){
-	httpPost(function(){
-		var inputField = document.getElementById("gammeltPassord");
-		if (parseInt(this.response)==1) {
-			inputField.setCustomValidity("");
-		} else {
-			inputField.setCustomValidity("Matcher ikke gammelt passord");
-		}
-	},"php/endrePassord.php","gammeltPassord="+passord);
 }
 
 
