@@ -11,13 +11,43 @@ if(isset($_SESSION['brukernavn'])){
 	$dir = '/home/skule/doklager/';
 	$file = "$dir$filId$filnavn";
 
-	//sammensatt transaksjon istedet for prosedyre
-	$query = 'CALL slettArkivpakke(?)';
-
 	if(unlink($file)){
-		echo databaseKobling($query,'i',array($arkivpakkeID));
+		echo sammensattTransaksjon($arkivpakkeID);
 	} else {
 		echo 0;
+	}
+}
+
+function sammensattTransaksjon($id){
+	require 'database.php';
+	$conn = new mysqli($hn, $un, $pw, $db);
+	//Hvis noe galt med connection send tilbake error
+	if ($conn->connect_error){
+		return $conn->connect_error;
+	}
+	$conn->set_charset("utf8");
+	$conn->query("BEGIN");
+
+	$stmt = $conn->prepare("SELECT dokfil INTO @temp FROM arkivpakke WHERE arkivID = ?");
+	$stmt->bind_param("i",$id);
+	$stmt->execute();
+
+	$stmt = $conn->prepare("DELETE FROM arkivpakke WHERE arkivID = ?");
+	$stmt->bind_param("i",$id);
+	$stmt->execute();
+	$raderEndret = $stmt->affected_rows;
+
+	$conn->query("DELETE FROM doklager WHERE filID = @temp");
+	$raderEndret += $conn->affected_rows;
+
+	//Hvis begge radene har blitt slettet utføres transaksjonen
+	if($raderEndret == 2){
+		$conn->query("COMMIT");
+		return $raderEndret;
+	//Ellers glemmes endringene
+	} else {
+		$conn->query("ROLLBACK");
+		return 0;
 	}
 }
 ?>
