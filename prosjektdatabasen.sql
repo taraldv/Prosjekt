@@ -63,14 +63,13 @@ CREATE TABLE arkivpakke (
 
 CREATE TABLE logg (
 	loggID INTEGER AUTO_INCREMENT,
-	arkivID INTEGER NOT NULL,
-	arkivskaper SMALLINT NOT NULL,
+	arkivID INTEGER,
+	arkivskaper SMALLINT,
 	statusTekst VARCHAR(100),
-	startDato DATE NOT NULL,
-	sluttDato DATE NOT NULL,
-	sistEndret TIMESTAMP,
-	endretAv INTEGER,
-	dokfil VARCHAR(150) NOT NULL,
+	startDato DATE,
+	sluttDato DATE,
+	sistEndret TIMESTAMP NOT NULL,
+	endretAv INTEGER NOT NULL,
 	slettet BOOLEAN,
 	CONSTRAINT loggPK
 	PRIMARY KEY (loggID)
@@ -78,10 +77,10 @@ CREATE TABLE logg (
 
 
 
-DROP TRIGGER IF EXISTS arkivpakkeARD;
 DROP TRIGGER IF EXISTS arkivpakkeARU;
 DROP FUNCTION IF EXISTS kommuneEksisterer;
 DROP FUNCTION IF EXISTS nyArkivpakke;
+DROP PROCEDURE IF EXISTS slettArkivpakke;
 
 DELIMITER ::
 
@@ -141,16 +140,27 @@ CREATE TRIGGER arkivpakkeARU
 AFTER UPDATE ON arkivpakke
 FOR EACH ROW
 BEGIN
-		INSERT INTO logg(arkivID,arkivskaper,statusTekst,startDato,sluttDato,sistEndret,endretAv,dokfil)
-		VALUES(OLD.arkivID,OLD.arkivskaper,OLD.statusTekst,OLD.startDato,OLD.sluttDato,OLD.sistEndret,OLD.endretAv,OLD.dokfil);
+		INSERT INTO logg(arkivID,arkivskaper,statusTekst,startDato,sluttDato,sistEndret,endretAv)
+		VALUES(OLD.arkivID,OLD.arkivskaper,OLD.statusTekst,OLD.startDato,OLD.sluttDato,OLD.sistEndret,OLD.endretAv);
 END::
 
-CREATE TRIGGER arkivpakkeARD
-AFTER DELETE ON arkivpakke
-FOR EACH ROW
+CREATE PROCEDURE slettArkivpakke
+(
+	IN p_arkivID INTEGER,
+	IN p_brukernavn VARCHAR(100),
+	OUT p_affectedRows INTEGER
+)
+
 BEGIN
-		INSERT INTO logg(arkivID,arkivskaper,statusTekst,startDato,sluttDato,sistEndret,endretAv,dokfil,slettet)
-		VALUES(OLD.arkivID,OLD.arkivskaper,OLD.statusTekst,OLD.startDato,OLD.sluttDato,OLD.sistEndret,OLD.endretAv,OLD.dokfil,TRUE);
+	DECLARE p_brukerID INTEGER;
+	DECLARE p_insertRow INTEGER;
+	DECLARE p_deleteRow INTEGER;
+	SELECT brukerID into p_brukerID FROM bruker WHERE brukernavn = p_brukernavn;
+	INSERT INTO logg(arkivID,sistEndret,endretAv,slettet) VALUES(p_arkivID,CURRENT_TIMESTAMP(),p_brukerID,TRUE);
+	SET p_affectedRows = ROW_COUNT();
+	DELETE FROM arkivpakke WHERE arkivID = p_arkivID; 
+	SELECT ROW_COUNT() INTO p_deleteRow;
+	SET p_affectedRows = p_affectedRows + ROW_COUNT();
 END::
 
 DELIMITER ;

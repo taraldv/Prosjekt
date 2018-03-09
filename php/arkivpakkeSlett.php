@@ -28,20 +28,23 @@ function sammensattTransaksjon($id){
 	$conn->set_charset("utf8");
 	$conn->query("BEGIN");
 
-	$stmt = $conn->prepare("SELECT dokfil INTO @temp FROM arkivpakke WHERE arkivID = ?");
+	$stmt = $conn->prepare("SELECT dokfil INTO @tempFilID FROM arkivpakke WHERE arkivID = ?");
 	$stmt->bind_param("i",$id);
 	$stmt->execute();
 
-	$stmt = $conn->prepare("DELETE FROM arkivpakke WHERE arkivID = ?");
-	$stmt->bind_param("i",$id);
+	$stmt = $conn->prepare("CALL slettArkivpakke(?,?,@tempInt)");
+	$stmt->bind_param("is",$id,$_SESSION['brukernavn']);
 	$stmt->execute();
-	$raderEndret = $stmt->affected_rows;
 
-	$conn->query("DELETE FROM doklager WHERE filID = @temp");
+	$result = $conn->query("SELECT @tempInt AS rader");
+	$antallRader = $result->fetch_all(MYSQLI_ASSOC);
+	$raderEndret = (int)$antallRader[0]['rader'];
+
+	$conn->query("DELETE FROM doklager WHERE filID = @tempFilID");
 	$raderEndret += $conn->affected_rows;
 
 	//Hvis begge radene har blitt slettet utføres transaksjonen
-	if($raderEndret == 2){
+	if($raderEndret == 3){
 		$conn->query("COMMIT");
 		return $raderEndret;
 	//Ellers glemmes endringene

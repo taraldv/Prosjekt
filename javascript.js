@@ -81,22 +81,18 @@ function settInnArkivpakkeLogg(){
 			var html = "<table id='arkivpakkeLoggTabell'><tbody><tr>"
 			+"<th>Sist endret</th>"
 			+"<th>Arkivskaper</th>"
-			+"<th>Ansvarlig</th>"
 			+"<th>Status</th>"
 			+"<th>Start dato</th>"
 			+"<th>Slutt dato</th>"
 			+"<th>Endret av</th>"
-			+"<th>Fil</th>"
 			+"</tr>";
 
 			//Definerer kolonne variabler til bruk i sammenligning 
 			var arkivskaper = "";
-			var ansvarlig = "";
 			var statusTekst = "";
 			var startDato = "";
 			var sluttDato = "";
 			var endretAv = "";
-			var dokfil = "";
 			
 
 			//Loop som går igjennom data fra php og legger til td elementer til html variabelen
@@ -110,9 +106,6 @@ function settInnArkivpakkeLogg(){
 				html += loggSammenligning(arkivskaper,tempObj.arkivskaper);
 				arkivskaper = tempObj.arkivskaper;
 
-				html += loggSammenligning(ansvarlig,tempObj.ansvarlig);
-				ansvarlig = tempObj.ansvarlig;
-
 				html += loggSammenligning(statusTekst,tempObj.statusTekst);
 				statusTekst = tempObj.statusTekst;
 
@@ -124,13 +117,6 @@ function settInnArkivpakkeLogg(){
 				
 				html += loggSammenligning(endretAv,tempObj.endretAv);
 				endretAv = tempObj.endretAv;
-
-				if (dokfil==tempObj.dokfil) {
-					html += "<td></td>";
-				} else {
-					html += "<td class='arkivpakkeLoggTabellSamling'>"+tempObj.dokfil+"</td>";
-				}
-				dokfil = tempObj.dokfil;
 				
 				html +="</tr>"
 
@@ -371,7 +357,7 @@ function slettArkivpakke(){
 	var id = row.getAttribute("data");
 	if (window.confirm("Er du sikker på sletting av arkivpakke?")) { 
 		httpPost(function(){
-			if (parseInt(this.response)==2) {
+			if (parseInt(this.response)==3) {
 				slettChildren(row);
 				row.insertAdjacentHTML('afterbegin',"<td colspan='10'><p class='red'>Arkivpakke slettet</p></td>")
 			} else {
