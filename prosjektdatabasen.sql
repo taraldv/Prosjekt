@@ -85,19 +85,23 @@ CREATE TABLE logg (
 DROP TRIGGER IF EXISTS arkivpakkeARD;
 DROP TRIGGER IF EXISTS arkivpakkeARU;
 DROP FUNCTION IF EXISTS kommuneEksisterer;
-DROP PROCEDURE IF EXISTS slettArkivpakke;
+DROP PROCEDURE IF EXISTS hentFilnavn;
 
 DELIMITER ::
 
-CREATE PROCEDURE slettArkivpakke(IN p_arkivpakkeID INT)
+CREATE PROCEDURE hentFilnavn
+(
+	IN p_arkivpakkeID INT,
+	OUT p_FerdigFilnavn VARCHAR(200)
+)
 BEGIN
-	DECLARE p_dokfil INT;
-	SELECT dokfil INTO p_dokfil
-	FROM arkivpakke WHERE arkivID = p_arkivpakkeID;
-	START TRANSACTION;
-	DELETE FROM arkivpakke WHERE arkivID = p_arkivpakkeID;
-	DELETE FROM doklager WHERE filID = p_dokfil;
-	COMMIT;
+	DECLARE p_filID VARCHAR(50);
+	DECLARE p_filnavn VARCHAR(150);
+
+	SELECT CAST(d.filID as CHAR(50)),d.filnavn INTO p_filID,p_filnavn
+	FROM arkivpakke a INNER JOIN doklager d ON a.dokfil = d.filID WHERE a.arkivID = p_arkivpakkeID;
+
+	SET p_FerdigFilnavn = CONCAT(p_filID,p_filnavn);
 END::
 
 CREATE FUNCTION kommuneEksisterer(p_kommunenavn VARCHAR(100))
