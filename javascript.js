@@ -307,7 +307,7 @@ function settInnArkivpakkeOversikt(){
 	var data = JSON.parse(this.response);
 
 	//Setter inn en tom tabell med tittel for nesten hver kolonne
-	var html = "<table id='arkivpakkeTabell'><tbody id='arkivpakkeTabellBody'><tr><th>Arkivskaper</th><th>Ansvarlig</th><th>Status</th>"
+	var html = "<table id='arkivpakkeTabell'><tbody id='arkivpakkeTabellBody'><tr><th>Arkivskaper</th><th>Status</th>"
 	+"<th>Start dato</th><th>Slutt dato</th><th>Sist endret</th></tr></tbody></table>"
 	document.getElementById("innhold").insertAdjacentHTML('beforeend',html);
 	var arkivpakkeTabellBodyNode = document.getElementById("arkivpakkeTabellBody");
@@ -327,7 +327,7 @@ function arkivpakkeTabellRad(arkivpakkeObjekt){
 
 	//Lager td elementer med data fra de 6 første verdiene i objektet
 	var keys = Object.keys(arkivpakkeObjekt);
-	for (var i = 0; i < 6; i++) {
+	for (var i = 0; i < 5; i++) {
 		var tempTD = document.createElement("td");
 		tempTD.innerHTML = arkivpakkeObjekt[keys[i]];
 		rad.appendChild(tempTD);
