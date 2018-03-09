@@ -10,7 +10,7 @@ if(isset($_SESSION['brukernavn'])){
 	$filnavn = $filResult[0]['filnavn'];
 	$dir = '/home/skule/doklager/';
 	$file = "$dir$filId$filnavn";
-	$query = 'DELETE FROM arkivpakke WHERE arkivID = ?';
+	$query = 'CALL slettArkivpakke(?)';
 
 	if(unlink($file)){
 		echo databaseKobling($query,'i',array($arkivpakkeID));

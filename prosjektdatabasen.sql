@@ -85,8 +85,20 @@ CREATE TABLE logg (
 DROP TRIGGER IF EXISTS arkivpakkeARD;
 DROP TRIGGER IF EXISTS arkivpakkeARU;
 DROP FUNCTION IF EXISTS kommuneEksisterer;
+DROP PROCEDURE IF EXISTS slettArkivpakke;
 
 DELIMITER ::
+
+CREATE PROCEDURE slettArkivpakke(IN p_arkivpakkeID INT)
+BEGIN
+	DECLARE p_dokfil INT;
+	SELECT dokfil INTO p_dokfil
+	FROM arkivpakke WHERE arkivID = p_arkivpakkeID;
+	START TRANSACTION;
+	DELETE FROM arkivpakke WHERE arkivID = p_arkivpakkeID;
+	DELETE FROM doklager WHERE filID = p_dokfil;
+	COMMIT;
+END::
 
 CREATE FUNCTION kommuneEksisterer(p_kommunenavn VARCHAR(100))
 	RETURNS BOOLEAN
