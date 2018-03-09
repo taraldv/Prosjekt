@@ -343,11 +343,8 @@ function sendInnNyArkivpakke(){
 		inputValidering(kommuneInput,data.validering==0,"Ugyldig kommune");
 		inputValidering(startDatoInput,isNaN(startDato) || !regex.exec(startDatoInput.value),"Ugyldig dato");
 		inputValidering(sluttDatoInput,isNaN(sluttDato) || !regex.exec(sluttDatoInput.value),"Ugyldig dato");
-		if (!fil) {
-			filInput.setCustomValidity("Fil ikke valgt");
-		} else if (fil.size>1000000) {
-			filInput.setCustomValidity("Fil for stor");
-		}
+		inputValidering(filInput,fil!=null && fil.size>1000000,"Fil for stor");
+		inputValidering(filInput,!fil,"Fil ikke valgt");
 	},"php/leggTilArkivpakke.php","validering=validering&kommune="+kommuneInput.value);
 
 }
@@ -510,12 +507,12 @@ function settInnLeggTilArkivpakke(){
 		var html = "<div id='leggTilArkivpakkeDiv'><h2>Legg til ny arkivpakke</h2></br>"
 
 		+"<div class='form-horizontal' id='skjema'>"
-			+"<div class='form-group'>"
-				+"<label class='control-label col-sm-3' for='arkivpakkeFilInput'>Last opp METSFIL</label>"
-				+"<div class='col-sm-3'>"
-					+"<input type='file' class='form-control-file' id='arkivpakkeFilInput'>"
-				+"</div>"
-			+"</div>"
+		+"<div class='form-group'>"
+		+"<label class='control-label col-sm-3' for='arkivpakkeFilInput'>Last opp METSFIL</label>"
+		+"<div class='col-sm-3 has-error'>"
+		+"<input type='file' class='form-control-file' id='arkivpakkeFilInput'>"
+		+"</div>"
+		+"</div>"
 		+"<div class='form-group'>"
 		+"<label class='control-label col-sm-3' for='arkivpakkeKommuneInput'>Arkivskaper:</label>"
 		+"<div class='col-sm-3' >"
