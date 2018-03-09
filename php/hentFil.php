@@ -15,6 +15,8 @@ if(isset($_SESSION['brukernavn'])&&isset($_GET['arkivID'])){
 		header('Content-Disposition: attachment; filename='.$filnavn);
 		header('Content-Length: ' . filesize($file));
 		readfile($file);
+	} else {
+		echo "fant ikke fil";
 	}
 }
 ?>

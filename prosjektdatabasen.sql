@@ -43,7 +43,6 @@ CREATE TABLE bruker (
 CREATE TABLE arkivpakke (
 	arkivID INTEGER AUTO_INCREMENT,
 	arkivskaper SMALLINT NOT NULL,
-	ansvarlig INTEGER NOT NULL,
 	statusTekst VARCHAR(100) NOT NULL,
 	startDato DATE NOT NULL,
 	sluttDato DATE NOT NULL,
@@ -58,8 +57,6 @@ CREATE TABLE arkivpakke (
 	FOREIGN KEY(dokfil) REFERENCES doklager(filID),
 	CONSTRAINT arkivskaperFK
 	FOREIGN KEY(arkivskaper) REFERENCES kommune(kommuneNr),
-	CONSTRAINT ansvarligFK
-	FOREIGN KEY(ansvarlig) REFERENCES bruker(brukerID),
 	CONSTRAINT endretAvFK
 	FOREIGN KEY(endretAv) REFERENCES bruker(brukerID)
 	) engine = InnoDB DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -68,7 +65,6 @@ CREATE TABLE logg (
 	loggID INTEGER AUTO_INCREMENT,
 	arkivID INTEGER NOT NULL,
 	arkivskaper SMALLINT NOT NULL,
-	ansvarlig INTEGER NOT NULL,
 	statusTekst VARCHAR(100),
 	startDato DATE NOT NULL,
 	sluttDato DATE NOT NULL,
@@ -85,23 +81,42 @@ CREATE TABLE logg (
 DROP TRIGGER IF EXISTS arkivpakkeARD;
 DROP TRIGGER IF EXISTS arkivpakkeARU;
 DROP FUNCTION IF EXISTS kommuneEksisterer;
-DROP PROCEDURE IF EXISTS hentFilnavn;
+DROP FUNCTION IF EXISTS nyArkivpakke;
 
 DELIMITER ::
 
-CREATE PROCEDURE hentFilnavn
+CREATE FUNCTION nyArkivpakke
 (
-	IN p_arkivpakkeID INT,
-	OUT p_FerdigFilnavn VARCHAR(200)
+	 p_filnavn VARCHAR(150),
+	 p_filStr DECIMAL(4,3),
+	 p_arkivskaper SMALLINT,
+	 p_statusTekst VARCHAR(100),
+	 p_startDato DATE,
+	 p_sluttDato DATE,
+	 p_endretAv INTEGER
 )
+RETURNS INTEGER
 BEGIN
-	DECLARE p_filID VARCHAR(50);
-	DECLARE p_filnavn VARCHAR(150);
+	DECLARE p_filID INTEGER;
 
-	SELECT CAST(d.filID as CHAR(50)),d.filnavn INTO p_filID,p_filnavn
-	FROM arkivpakke a INNER JOIN doklager d ON a.dokfil = d.filID WHERE a.arkivID = p_arkivpakkeID;
-
-	SET p_FerdigFilnavn = CONCAT(p_filID,p_filnavn);
+	INSERT INTO doklager(filnavn,filstørrelse)
+		VALUES(p_filnavn,p_filStr);
+	SET p_filID = LAST_INSERT_ID();
+	INSERT INTO arkivpakke(arkivskaper,
+		statusTekst,
+		startDato,
+		sluttDato,
+		sistEndret,
+		endretAv,
+		dokfil)
+		VALUES(p_arkivskaper,
+			p_statusTekst,
+			p_startDato,
+			p_sluttDato,
+			CURRENT_TIMESTAMP(),
+			p_endretAv,
+			p_filID);
+	RETURN p_filID;
 END::
 
 CREATE FUNCTION kommuneEksisterer(p_kommunenavn VARCHAR(100))
@@ -126,16 +141,16 @@ CREATE TRIGGER arkivpakkeARU
 AFTER UPDATE ON arkivpakke
 FOR EACH ROW
 BEGIN
-		INSERT INTO logg(arkivID,arkivskaper,ansvarlig,statusTekst,startDato,sluttDato,sistEndret,endretAv,dokfil)
-		VALUES(OLD.arkivID,OLD.arkivskaper,OLD.ansvarlig,OLD.statusTekst,OLD.startDato,OLD.sluttDato,OLD.sistEndret,OLD.endretAv,OLD.dokfil);
+		INSERT INTO logg(arkivID,arkivskaper,statusTekst,startDato,sluttDato,sistEndret,endretAv,dokfil)
+		VALUES(OLD.arkivID,OLD.arkivskaper,OLD.statusTekst,OLD.startDato,OLD.sluttDato,OLD.sistEndret,OLD.endretAv,OLD.dokfil);
 END::
 
 CREATE TRIGGER arkivpakkeARD
 AFTER DELETE ON arkivpakke
 FOR EACH ROW
 BEGIN
-		INSERT INTO logg(arkivID,arkivskaper,ansvarlig,statusTekst,startDato,sluttDato,sistEndret,endretAv,dokfil,slettet)
-		VALUES(OLD.arkivID,OLD.arkivskaper,OLD.ansvarlig,OLD.statusTekst,OLD.startDato,OLD.sluttDato,OLD.sistEndret,OLD.endretAv,OLD.dokfil,TRUE);
+		INSERT INTO logg(arkivID,arkivskaper,statusTekst,startDato,sluttDato,sistEndret,endretAv,dokfil,slettet)
+		VALUES(OLD.arkivID,OLD.arkivskaper,OLD.statusTekst,OLD.startDato,OLD.sluttDato,OLD.sistEndret,OLD.endretAv,OLD.dokfil,TRUE);
 END::
 
 DELIMITER ;
@@ -581,88 +596,88 @@ VALUES('avtalt'),
 ('i dsm');
 
 INSERT INTO doklager(filnavn,filstørrelse)
-VALUES ('Nordkapp.xml',1.1),
-('Røyken.xml',1.1),
-('Kvam.xml',1.1),
-('Høylandet.xml',1.1),
-('Porsanger – Porsáŋgu – Porsanki.xml',1.1),
-('Etne.xml',1.1),
-('Ringerike.xml',1.1),
-('Nesodden.xml',1.1),
-('Radøy.xml',1.1),
-('Eidsvoll.xml',1.1),
-('Suldal.xml',1.1),
-('Holmestrand.xml',1.1),
-('Masfjorden.xml',1.1),
-('Flesberg.xml',1.1),
-('Kvæfjord.xml',1.1),
-('Kárášjohka – Karasjok .xml',1.1),
-('Eidfjord.xml',1.1),
-('Sandefjord.xml',1.1),
-('Sveio.xml',1.1),
-('Rindal.xml',1.1),
-('Bergen.xml',1.1),
-('Hol.xml',1.1),
-('Hitra.xml',1.1),
-('Bamble.xml',1.1),
-('Kviteseid.xml',1.1),
-('Måsøy.xml',1.1),
-('Stordal.xml',1.1),
-('Sirdal.xml',1.1),
-('Rindal.xml',1.1),
-('Båtsfjord.xml',1.1),
-('Eide.xml',1.1),
-('Fredrikstad.xml',1.1),
-('Beiarn.xml',1.1),
+VALUES ('Halden.xml',1.1),
+('Gjerstad.xml',1.1),
+('Tysnes.xml',1.1),
+('Meldal.xml',1.1),
+('Tingvoll.xml',1.1),
+('Hvaler.xml',1.1),
+('Dyrøy.xml',1.1),
+('Luster.xml',1.1),
+('Vågan.xml',1.1),
+('Stor-Elvdal.xml',1.1),
+('Bykle.xml',1.1),
+('Gjesdal.xml',1.1),
+('Bokn.xml',1.1),
+('Norddal.xml',1.1),
+('Finnøy.xml',1.1),
+('Bremanger.xml',1.1),
+('Kragerø.xml',1.1),
+('Rælingen.xml',1.1),
+('Lier.xml',1.1),
+('Herøy i Nordland.xml',1.1),
+('Steinkjer.xml',1.1),
 ('Åseral.xml',1.1),
-('Ullensvang.xml',1.1),
-('Audnedal.xml',1.1),
-('Oslo.xml',1.1),
-('Rygge.xml',1.1),
-('Marker.xml',1.1),
-('Stord.xml',1.1);
+('Nord-Odal.xml',1.1),
+('Aukra.xml',1.1),
+('Tydal.xml',1.1),
+('Alstahaug.xml',1.1),
+('Gloppen.xml',1.1),
+('Rennebu.xml',1.1),
+('Lurøy.xml',1.1),
+('Sømna.xml',1.1),
+('Sauda.xml',1.1),
+('Kongsvinger.xml',1.1),
+('Sømna.xml',1.1),
+('Inderøy.xml',1.1),
+('Nore og Uvdal.xml',1.1),
+('Risør.xml',1.1),
+('Ørsta.xml',1.1),
+('Nannestad.xml',1.1),
+('Sigdal.xml',1.1),
+('Leka.xml',1.1);
 
-INSERT INTO arkivpakke(arkivskaper, ansvarlig, statusTekst, startDato, sluttDato, sistEndret, endretAv, dokfil)
-VALUES (2019,1,'avtalt','2008-10-24','2013-4-25',CURRENT_TIMESTAMP(),2,1),
-(627,2,'mottatt','2002-9-23','2014-10-22',CURRENT_TIMESTAMP(),1,2),
-(1238,2,'i karantene','2003-11-22','2004-2-13',CURRENT_TIMESTAMP(),1,3),
-(5046,1,'avvist, venter ny deponering','2006-2-21','2016-10-13',CURRENT_TIMESTAMP(),2,4),
-(2020,1,'avtalt','2007-2-2','2009-8-15',CURRENT_TIMESTAMP(),1,5),
-(1211,1,'i dsm','2002-4-15','2013-7-24',CURRENT_TIMESTAMP(),2,6),
-(605,2,'mottatt','2002-5-22','2012-4-5',CURRENT_TIMESTAMP(),2,7),
-(216,2,'i dsm','2003-1-7','2017-4-12',CURRENT_TIMESTAMP(),2,8),
-(1260,2,'i dsm','2000-2-28','2011-6-10',CURRENT_TIMESTAMP(),2,9),
-(237,2,'godkjent','2007-7-28','2014-10-25',CURRENT_TIMESTAMP(),1,10),
-(1134,1,'i dsm','2014-7-23','2017-1-14',CURRENT_TIMESTAMP(),1,11),
-(715,2,'avvist, venter ny deponering','2006-9-23','2008-10-7',CURRENT_TIMESTAMP(),2,12),
-(1266,1,'godkjent','2011-8-28','2014-9-12',CURRENT_TIMESTAMP(),2,13),
-(631,2,'i test','2004-2-27','2008-9-13',CURRENT_TIMESTAMP(),1,14),
-(1911,1,'avvist, venter ny deponering','2005-10-24','2015-11-28',CURRENT_TIMESTAMP(),1,15),
-(2021,1,'i test','2002-7-8','2015-9-21',CURRENT_TIMESTAMP(),2,16),
-(1232,2,'mottatt','2004-6-20','2014-9-15',CURRENT_TIMESTAMP(),1,17),
-(710,1,'mottatt','2005-3-6','2006-3-18',CURRENT_TIMESTAMP(),2,18),
-(1216,2,'i karantene','2013-3-4','2014-8-15',CURRENT_TIMESTAMP(),1,19),
-(1567,2,'avtalt','2000-4-23','2004-11-28',CURRENT_TIMESTAMP(),1,20),
-(1201,2,'i dsm','2001-9-20','2007-9-16',CURRENT_TIMESTAMP(),1,21),
-(620,1,'godkjent','2003-8-6','2011-3-16',CURRENT_TIMESTAMP(),2,22),
-(5013,1,'mottatt','2002-3-17','2009-10-26',CURRENT_TIMESTAMP(),2,23),
-(814,1,'godkjent','2005-9-8','2013-4-13',CURRENT_TIMESTAMP(),1,24),
-(829,2,'avtalt','2005-9-9','2008-7-21',CURRENT_TIMESTAMP(),1,25),
-(2018,1,'i test','2004-3-15','2010-1-18',CURRENT_TIMESTAMP(),2,26),
-(1526,1,'godkjent','2004-2-9','2009-2-23',CURRENT_TIMESTAMP(),1,27),
-(1046,1,'i karantene','2011-8-6','2013-1-16',CURRENT_TIMESTAMP(),2,28),
-(1567,2,'i karantene','2000-4-26','2003-3-28',CURRENT_TIMESTAMP(),2,29),
-(2028,1,'i test','2010-1-21','2012-10-17',CURRENT_TIMESTAMP(),2,30),
-(1551,2,'godkjent','2005-5-24','2009-9-26',CURRENT_TIMESTAMP(),2,31),
-(106,2,'avvist, venter ny deponering','2008-10-1','2017-8-28',CURRENT_TIMESTAMP(),1,32),
-(1839,1,'avvist, venter ny deponering','2011-10-18','2012-6-9',CURRENT_TIMESTAMP(),1,33),
-(1026,2,'i karantene','2001-5-2','2003-10-22',CURRENT_TIMESTAMP(),1,34),
-(1231,2,'mottatt','2012-10-6','2015-3-26',CURRENT_TIMESTAMP(),1,35),
-(1027,2,'i karantene','2000-6-13','2003-10-13',CURRENT_TIMESTAMP(),2,36),
-(301,1,'avtalt','2000-8-1','2004-2-9',CURRENT_TIMESTAMP(),2,37),
-(136,1,'avtalt','2010-7-3','2013-1-11',CURRENT_TIMESTAMP(),2,38),
-(119,2,'i test','2004-8-20','2007-8-12',CURRENT_TIMESTAMP(),1,39),
-(1221,1,'i dsm','2000-1-13','2016-11-20',CURRENT_TIMESTAMP(),1,40);
+INSERT INTO arkivpakke(arkivskaper, statusTekst, startDato, sluttDato, sistEndret, endretAv, dokfil)
+VALUES (101,'avtalt','2001-4-14','2003-3-10',CURRENT_TIMESTAMP(),1,1),
+(911,'avtalt','2005-1-17','2006-11-21',CURRENT_TIMESTAMP(),1,2),
+(1223,'avtalt','2014-4-24','2016-5-28',CURRENT_TIMESTAMP(),2,3),
+(5023,'i test','2002-9-19','2017-2-11',CURRENT_TIMESTAMP(),1,4),
+(1560,'i test','2005-6-15','2007-6-19',CURRENT_TIMESTAMP(),1,5),
+(111,'avtalt','2006-9-4','2013-4-20',CURRENT_TIMESTAMP(),2,6),
+(1926,'i dsm','2002-5-22','2006-2-12',CURRENT_TIMESTAMP(),1,7),
+(1426,'i test','2003-2-11','2010-1-1',CURRENT_TIMESTAMP(),2,8),
+(1865,'avvist, venter ny deponering','2007-6-10','2011-3-4',CURRENT_TIMESTAMP(),2,9),
+(430,'mottatt','2005-6-24','2006-7-5',CURRENT_TIMESTAMP(),2,10),
+(941,'avtalt','2003-3-28','2013-7-9',CURRENT_TIMESTAMP(),1,11),
+(1122,'i dsm','2000-1-25','2006-4-7',CURRENT_TIMESTAMP(),2,12),
+(1145,'i karantene','2001-7-17','2011-1-6',CURRENT_TIMESTAMP(),1,13),
+(1524,'godkjent','2001-7-11','2003-1-27',CURRENT_TIMESTAMP(),2,14),
+(1141,'avtalt','2005-9-10','2006-6-19',CURRENT_TIMESTAMP(),1,15),
+(1438,'i karantene','2001-9-9','2007-11-10',CURRENT_TIMESTAMP(),2,16),
+(815,'godkjent','2006-1-7','2008-11-19',CURRENT_TIMESTAMP(),2,17),
+(228,'i test','2011-4-27','2017-11-15',CURRENT_TIMESTAMP(),1,18),
+(626,'avvist, venter ny deponering','2009-5-4','2012-1-13',CURRENT_TIMESTAMP(),2,19),
+(1818,'i karantene','2002-4-2','2017-10-20',CURRENT_TIMESTAMP(),2,20),
+(5004,'mottatt','2010-1-28','2012-1-16',CURRENT_TIMESTAMP(),2,21),
+(1026,'i dsm','2008-9-3','2009-11-28',CURRENT_TIMESTAMP(),2,22),
+(418,'i dsm','2015-3-4','2016-9-19',CURRENT_TIMESTAMP(),2,23),
+(1547,'i test','2000-10-26','2014-3-3',CURRENT_TIMESTAMP(),1,24),
+(5033,'i test','2002-6-12','2009-2-12',CURRENT_TIMESTAMP(),2,25),
+(1820,'mottatt','2006-3-13','2013-3-8',CURRENT_TIMESTAMP(),2,26),
+(1445,'i karantene','2001-9-21','2016-10-16',CURRENT_TIMESTAMP(),2,27),
+(5022,'i test','2010-11-4','2015-7-28',CURRENT_TIMESTAMP(),1,28),
+(1834,'i dsm','2014-4-27','2015-1-27',CURRENT_TIMESTAMP(),1,29),
+(1812,'godkjent','2001-8-28','2005-6-7',CURRENT_TIMESTAMP(),1,30),
+(1135,'godkjent','2006-7-27','2011-6-3',CURRENT_TIMESTAMP(),2,31),
+(402,'i test','2002-7-21','2017-9-20',CURRENT_TIMESTAMP(),2,32),
+(1812,'mottatt','2007-3-12','2015-9-28',CURRENT_TIMESTAMP(),1,33),
+(5053,'mottatt','2009-2-2','2012-11-5',CURRENT_TIMESTAMP(),1,34),
+(633,'i dsm','2008-11-17','2009-6-6',CURRENT_TIMESTAMP(),2,35),
+(901,'godkjent','2013-7-9','2014-3-27',CURRENT_TIMESTAMP(),2,36),
+(1520,'i karantene','2010-2-24','2015-11-18',CURRENT_TIMESTAMP(),2,37),
+(238,'i karantene','2012-3-23','2016-9-14',CURRENT_TIMESTAMP(),1,38),
+(621,'i test','2014-4-23','2017-8-8',CURRENT_TIMESTAMP(),1,39),
+(5052,'avvist, venter ny deponering','2012-1-27','2013-10-17',CURRENT_TIMESTAMP(),2,40);
 
 UPDATE arkivpakke SET statusTekst = 'avvist, venter ny deponering',endretAv = 1 WHERE arkivID = 1;
 UPDATE arkivpakke SET sluttDato = '2015-10-22',endretAv = 1 WHERE arkivID = 2;
@@ -670,7 +685,3 @@ UPDATE arkivpakke SET statusTekst = 'avvist, venter ny deponering',endretAv = 1 
 UPDATE arkivpakke SET sluttDato = '2018-01-22',endretAv = 2 WHERE arkivID = 4;
 UPDATE arkivpakke SET sluttDato = '2016-01-01',endretAv = 2 WHERE arkivID = 2;
 UPDATE arkivpakke SET statusTekst = 'avtalt',endretAv = 1 WHERE arkivID = 2;
-UPDATE arkivpakke SET ansvarlig= 2,endretAv = 1 WHERE arkivID = 2;
-DELETE FROM arkivpakke where arkivID = 4;
-DELETE FROM arkivpakke where arkivID = 5;
-DELETE FROM arkivpakke where arkivID = 6;

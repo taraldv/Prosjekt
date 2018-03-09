@@ -257,7 +257,7 @@ function sendArkivpakkeEndring(){
 		}
 	},"php/endreArkivpakke.php","validering=validering&ansvarlig="+ansvarligInput.value);
 }
-//TODO samme som sendArkivpakkeEndring
+//TODO erstatte med form og php
 function sendInnNyArkivpakke(){
 	var filInput = document.getElementById("arkivpakkeFilInput");
 	var fil = filInput.files[0];
