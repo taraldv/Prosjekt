@@ -76,7 +76,7 @@ CREATE TABLE logg (
 	) engine = InnoDB DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-
+DROP TRIGGER IF EXISTS arkivpakkeBRD;
 DROP TRIGGER IF EXISTS arkivpakkeARU;
 DROP FUNCTION IF EXISTS kommuneEksisterer;
 DROP FUNCTION IF EXISTS nyArkivpakke;
@@ -140,9 +140,17 @@ CREATE TRIGGER arkivpakkeARU
 AFTER UPDATE ON arkivpakke
 FOR EACH ROW
 BEGIN
-		INSERT INTO logg(arkivID,arkivskaper,statusTekst,startDato,sluttDato,sistEndret,endretAv)
-		VALUES(OLD.arkivID,OLD.arkivskaper,OLD.statusTekst,OLD.startDato,OLD.sluttDato,OLD.sistEndret,OLD.endretAv);
+	INSERT INTO logg(arkivID,arkivskaper,statusTekst,startDato,sluttDato,sistEndret,endretAv)
+	VALUES(OLD.arkivID,OLD.arkivskaper,OLD.statusTekst,OLD.startDato,OLD.sluttDato,OLD.sistEndret,OLD.endretAv);
 END::
+
+ CREATE TRIGGER arkivpakkeBRD
+ BEFORE DELETE ON arkivpakke
+ FOR EACH ROW
+ BEGIN
+	INSERT INTO logg(arkivID,arkivskaper,statusTekst,startDato,sluttDato,sistEndret,endretAv)
+	VALUES(OLD.arkivID,OLD.arkivskaper,OLD.statusTekst,OLD.startDato,OLD.sluttDato,OLD.sistEndret,OLD.endretAv);
+ END::
 
 CREATE PROCEDURE slettArkivpakke
 (
@@ -156,9 +164,9 @@ BEGIN
 	DECLARE p_insertRow INTEGER;
 	DECLARE p_deleteRow INTEGER;
 	SELECT brukerID into p_brukerID FROM bruker WHERE brukernavn = p_brukernavn;
-	INSERT INTO logg(arkivID,sistEndret,endretAv,slettet) VALUES(p_arkivID,CURRENT_TIMESTAMP(),p_brukerID,TRUE);
+	DELETE FROM arkivpakke WHERE arkivID = p_arkivID;
 	SET p_affectedRows = ROW_COUNT();
-	DELETE FROM arkivpakke WHERE arkivID = p_arkivID; 
+	INSERT INTO logg(arkivID,sistEndret,endretAv,slettet) VALUES(p_arkivID,CURRENT_TIMESTAMP(),p_brukerID,TRUE);
 	SELECT ROW_COUNT() INTO p_deleteRow;
 	SET p_affectedRows = p_affectedRows + ROW_COUNT();
 END::
