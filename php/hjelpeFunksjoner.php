@@ -9,6 +9,7 @@ function databaseKoblingUtenParam($queryString){
 	}
 	$conn->set_charset("utf8");
 	$result = $conn->query($queryString);
+	$conn -> close();
 	return $result->fetch_all(MYSQLI_ASSOC);
 }
 
@@ -35,15 +36,19 @@ function databaseKobling($queryString,$typeString,$paramArray){
 	$result = $stmt->get_result();
 	//Hvis noe går galt med query sendes error tilbake
 	if ($stmt->error){
+		$conn -> close();
 		return $stmt->error;
 		//Hvis query har et resultat (select) sendes det tilbake
 	}elseif ($result) {
+		$conn -> close();
 		return $result->fetch_all(MYSQLI_ASSOC);
 		//Hvis query er insert og tabellen har auto_increment sendes den siste IDen tilbake
 	} elseif ($stmt->insert_id) {
+		$conn -> close();
 		return $stmt->insert_id;
 		//Ellers sendes antall rader påvirket
 	} else {
+		$conn -> close();
 		return $stmt->affected_rows;
 	}
 }

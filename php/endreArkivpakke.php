@@ -2,6 +2,8 @@
 require_once 'hjelpeFunksjoner.php';
 session_start();
 if (isset($_SESSION['brukernavn']) && isset($_POST['validering'])) {
+
+	//gjør om til prosedyre
 	$query = 'SELECT 1 FROM bruker WHERE brukernavn = ?';
 	$result = databaseKobling($query,'s',array($_POST['ansvarlig']));
 	echo json_encode($result);

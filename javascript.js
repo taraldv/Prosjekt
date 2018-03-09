@@ -24,7 +24,7 @@ function lesURL(){
 		}
 
 	//Hvis try blokken ikke fungerer så sjekkes det om bruker har en session eller ikke
-} catch (TypeError){
+	} catch (TypeError){
 		//Sender en POST uten parameter til sessionSjekk.php
 		httpPost(function(){
 			//Responsen fra php er brukernavn: $brukernavn i JSON format hvis session eksisterer.

@@ -10,6 +10,8 @@ if(isset($_SESSION['brukernavn'])){
 	$filnavn = $filResult[0]['filnavn'];
 	$dir = '/home/skule/doklager/';
 	$file = "$dir$filId$filnavn";
+
+	//sammensatt transaksjon istedet for prosedyre
 	$query = 'CALL slettArkivpakke(?)';
 
 	if(unlink($file)){
