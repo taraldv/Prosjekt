@@ -510,36 +510,40 @@ function settInnLeggTilArkivpakke(){
 		var html = "<div id='leggTilArkivpakkeDiv'><h2>Legg til ny arkivpakke</h2></br>"
 
 		+"<div class='form-horizontal' id='skjema'>"
-	//+"<form class='form-horizontal' id='skjema' action='php/leggTilArkivpakke.php' method='POST'>"
-	+"<div class='form-group'>"
-	+"<label class='control-label col-sm-3' for='arkivpakkeFilInput'>Last opp METSFIL</label>"
-	+"<div class='col-sm-3'>"
-	+"<input type='file' id='arkivpakkeFilInput'></div></div>"
-	+"<div class='form-group'>"
-	+"<label class='control-label col-sm-3' for='arkivpakkeKommuneInput'>Arkivskaper:</label>"
-	+"<div class='col-sm-3' >"
-	+"<input type='text' class='form-control' id='arkivpakkeKommuneInput' placeholder='Kommune'></div></div>"
-	+"<div class='form-group'>"
-	+"<label class='control-label col-sm-3' for='arkivpakkeStatusSelect'>Status:</label>"
-	+"<div class='col-sm-3'>"
-	+"<select class='form-control' id='arkivpakkeStatusSelect'>"+options+"</select>"
-	+"</div></div>"
+			+"<div class='form-group'>"
+				+"<label class='control-label col-sm-3' for='arkivpakkeFilInput'>Last opp METSFIL</label>"
+				+"<div class='col-sm-3'>"
+					+"<label class='custom-file'>"
+  					+"<input type='file' id='arkivpakkeFilInput' class='custom-file-input'>"
+ 					+"<span class='custom-file-control'></span>"
+					+"</label>"
+				+"</div>"
+			+"</div>"
+		+"<div class='form-group'>"
+		+"<label class='control-label col-sm-3' for='arkivpakkeKommuneInput'>Arkivskaper:</label>"
+		+"<div class='col-sm-3' >"
+		+"<input type='text' class='form-control' id='arkivpakkeKommuneInput' placeholder='Kommune'></div></div>"
+		+"<div class='form-group'>"
+		+"<label class='control-label col-sm-3' for='arkivpakkeStatusSelect'>Status:</label>"
+		+"<div class='col-sm-3'>"
+		+"<select class='form-control' id='arkivpakkeStatusSelect'>"+options+"</select>"
+		+"</div></div>"
 
-	+"<div class='form-group'>"
-	+"<label class='control-label col-sm-3' for='arkivpakkeStartDatoInput'>Gyldig startdato: åååå-mm-dd</label>"
-	+"<div class='col-sm-3'>"
-	+"<input type='text' class='form-control' id='arkivpakkeStartDatoInput' placeholder='Start dato'></div></div>"
-	+"<div class='form-group'>"
-	+"<label class='control-label col-sm-3' for='arkivpakkeSluttDatoInput'>Gyldig sluttdato: åååå-mm-dd</label>"
-	+"<div class='col-sm-3'>"
-	+"<input type='text' class='form-control' id='arkivpakkeSluttDatoInput' placeholder='Slutt dato'></div></div>"
-	+"<div class='form-group'>"       
-	+"<div class='col-sm-offset-2 col-sm-3'>"
-	+"<button id='leggTilArkivpakkeButton' class='btn btn-default'>Lagre</div></div>"
-	+"</div></div>";
-	document.getElementById("innhold").insertAdjacentHTML('beforeend',html);
-	document.getElementById("leggTilArkivpakkeButton").addEventListener("click",sendInnNyArkivpakke);
-},"php/leggTilArkivpakke.php","statustype=statustype");
+		+"<div class='form-group'>"
+		+"<label class='control-label col-sm-3' for='arkivpakkeStartDatoInput'>Gyldig startdato: åååå-mm-dd</label>"
+		+"<div class='col-sm-3'>"
+		+"<input type='text' class='form-control' id='arkivpakkeStartDatoInput' placeholder='Start dato'></div></div>"
+		+"<div class='form-group'>"
+		+"<label class='control-label col-sm-3' for='arkivpakkeSluttDatoInput'>Gyldig sluttdato: åååå-mm-dd</label>"
+		+"<div class='col-sm-3'>"
+		+"<input type='text' class='form-control' id='arkivpakkeSluttDatoInput' placeholder='Slutt dato'></div></div>"
+		+"<div class='form-group'>"       
+		+"<div class='col-sm-offset-2 col-sm-3'>"
+		+"<button id='leggTilArkivpakkeButton' class='btn btn-default'>Lagre</div></div>"
+		+"</div></div>";
+		document.getElementById("innhold").insertAdjacentHTML('beforeend',html);
+		document.getElementById("leggTilArkivpakkeButton").addEventListener("click",sendInnNyArkivpakke);
+	},"php/leggTilArkivpakke.php","statustype=statustype");
 }
 
 
