@@ -76,7 +76,7 @@ CREATE TABLE logg (
 	) engine = InnoDB DEFAULT CHARACTER SET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
-DROP TRIGGER IF EXISTS arkivpakkeBRD;
+DROP TRIGGER IF EXISTS arkivpakkeARI;
 DROP TRIGGER IF EXISTS arkivpakkeARU;
 DROP FUNCTION IF EXISTS kommuneEksisterer;
 DROP FUNCTION IF EXISTS nyArkivpakke;
@@ -141,16 +141,24 @@ AFTER UPDATE ON arkivpakke
 FOR EACH ROW
 BEGIN
 	INSERT INTO logg(arkivID,arkivskaper,statusTekst,startDato,sluttDato,sistEndret,endretAv)
-	VALUES(OLD.arkivID,OLD.arkivskaper,OLD.statusTekst,OLD.startDato,OLD.sluttDato,OLD.sistEndret,OLD.endretAv);
+	VALUES(NEW.arkivID,NEW.arkivskaper,NEW.statusTekst,NEW.startDato,NEW.sluttDato,NEW.sistEndret,NEW.endretAv);
 END::
 
- CREATE TRIGGER arkivpakkeBRD
+CREATE TRIGGER arkivpakkeARI
+AFTER INSERT ON arkivpakke
+FOR EACH ROW
+BEGIN
+	INSERT INTO logg(arkivID,arkivskaper,statusTekst,startDato,sluttDato,sistEndret,endretAv)
+	VALUES(NEW.arkivID,NEW.arkivskaper,NEW.statusTekst,NEW.startDato,NEW.sluttDato,NEW.sistEndret,NEW.endretAv);
+END::
+
+ /*CREATE TRIGGER arkivpakkeBRD
  BEFORE DELETE ON arkivpakke
  FOR EACH ROW
  BEGIN
 	INSERT INTO logg(arkivID,arkivskaper,statusTekst,startDato,sluttDato,sistEndret,endretAv)
-	VALUES(OLD.arkivID,OLD.arkivskaper,OLD.statusTekst,OLD.startDato,OLD.sluttDato,OLD.sistEndret,OLD.endretAv);
- END::
+	VALUES(NEW.arkivID,NEW.arkivskaper,NEW.statusTekst,NEW.startDato,NEW.sluttDato,NEW.sistEndret,NEW.endretAv);
+ END::*/
 
 CREATE PROCEDURE slettArkivpakke
 (
@@ -190,7 +198,7 @@ VALUES(101,'Halden'),
 (128,'Rakkestad'),
 (135,'Råde'),
 (136,'Rygge'),
-(137,'Våler i Østfold'),
+(137,'Våler i ØstfNEW'),
 (138,'Hobøl'),
 (211,'Vestby'),
 (213,'Ski'),
@@ -289,7 +297,7 @@ VALUES(101,'Halden'),
 (710,'Sandefjord'),
 (711,'Svelvik'),
 (712,'Larvik'),
-(713,'Sande i Vestfold'),
+(713,'Sande i VestfNEW'),
 (715,'Holmestrand'),
 (716,'Re'),
 (729,'Færder'),
@@ -426,7 +434,7 @@ VALUES(101,'Halden'),
 (1444,'Hornindal'),
 (1445,'Gloppen'),
 (1449,'Stryn'),
-(1502,'Molde'),
+(1502,'MNEWe'),
 (1504,'Ålesund'),
 (1505,'Kristiansund'),
 (1511,'Vanylven'),
@@ -434,7 +442,7 @@ VALUES(101,'Halden'),
 (1515,'Herøy i Møre og Romsdal'),
 (1516,'Ulstein'),
 (1517,'Hareid'),
-(1519,'Volda'),
+(1519,'VNEWa'),
 (1520,'Ørsta'),
 (1523,'Ørskog'),
 (1524,'Norddal'),
@@ -487,7 +495,7 @@ VALUES(101,'Halden'),
 (1839,'Beiarn'),
 (1840,'Saltdal'),
 (1841,'Fauske – Fuossko'),
-(1845,'Sørfold'),
+(1845,'SørfNEW'),
 (1848,'Steigen'),
 (1849,'Hamarøy – Hábmer'),
 (1850,'Divtasvuodna – Tysfjord'),

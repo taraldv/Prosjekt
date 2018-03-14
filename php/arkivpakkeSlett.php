@@ -9,48 +9,47 @@ if(isset($_SESSION['brukernavn'])){
 	$filId = $filResult[0]['filID'];
 	$filnavn = $filResult[0]['filnavn'];
 	$dir = '/home/skule/doklager/';
-	$file = "$dir$filId$filnavn";
+	$fil = "$dir$filId$filnavn";
 
-	if(unlink($file)){
-		echo sammensattTransaksjon($arkivpakkeID);
-	} else {
-		echo 0;
-	}
-}
-
-function sammensattTransaksjon($id){
-	require 'database.php';
-	$conn = new mysqli($hn, $un, $pw, $db);
+	if(file_exists($fil)){
+		require 'database.php';
+		$conn = new mysqli($hn, $un, $pw, $db);
 	//Hvis noe galt med connection send tilbake error
-	if ($conn->connect_error){
-		return $conn->connect_error;
-	}
-	$conn->set_charset("utf8");
-	$conn->query("BEGIN");
+		if ($conn->connect_error){
+			return $conn->connect_error;
+		}
+		$conn->set_charset("utf8");
 
-	$stmt = $conn->prepare("SELECT dokfil INTO @tempFilID FROM arkivpakke WHERE arkivID = ?");
-	$stmt->bind_param("i",$id);
-	$stmt->execute();
+		//Starter sammensatt transaksjon
+		$conn->query("BEGIN");
 
-	$stmt = $conn->prepare("CALL slettArkivpakke(?,?,@tempInt)");
-	$stmt->bind_param("is",$id,$_SESSION['brukernavn']);
-	$stmt->execute();
+		$stmt = $conn->prepare("SELECT dokfil INTO @tempFilID FROM arkivpakke WHERE arkivID = ?");
+		$stmt->bind_param("i",$arkivpakkeID);
+		$stmt->execute();
 
-	$result = $conn->query("SELECT @tempInt AS rader");
-	$antallRader = $result->fetch_all(MYSQLI_ASSOC);
-	$raderEndret = (int)$antallRader[0]['rader'];
+		//SQL Procedure som sletter arkivpakken og setter inn en siste rad i loggen.
+		$stmt = $conn->prepare("CALL slettArkivpakke(?,?,@tempInt)");
+		$stmt->bind_param("is",$arkivpakkeID,$_SESSION['brukernavn']);
+		$stmt->execute();
 
-	$conn->query("DELETE FROM doklager WHERE filID = @tempFilID");
-	$raderEndret += $conn->affected_rows;
+		$result = $conn->query("SELECT @tempInt AS rader");
+		$antallRader = $result->fetch_all(MYSQLI_ASSOC);
+		$raderEndret = (int)$antallRader[0]['rader'];
 
-	//Hvis begge radene har blitt slettet utføres transaksjonen
-	if($raderEndret == 3){
-		$conn->query("COMMIT");
-		return $raderEndret;
-	//Ellers glemmes endringene
+		$conn->query("DELETE FROM doklager WHERE filID = @tempFilID");
+		$raderEndret += $conn->affected_rows;
+
+		//Hvis 3 rader har blitt endret og fil slettet ferdigjøres transaksjon
+		if($raderEndret == 3 && unlink($fil)){
+			$conn->query("COMMIT");
+			echo 1;
+		//Ellers glemmes endringene
+		} else {
+			$conn->query("ROLLBACK");
+			echo "SQL error, arkivpakke ble ikke slettet";
+		}
 	} else {
-		$conn->query("ROLLBACK");
-		return 0;
+		echo "Fil ble ikke funnet";
 	}
 }
 ?>

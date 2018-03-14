@@ -357,11 +357,11 @@ function slettArkivpakke(){
 	var id = row.getAttribute("data");
 	if (window.confirm("Er du sikker på sletting av arkivpakke?")) { 
 		httpPost(function(){
-			if (parseInt(this.response)==3) {
+			if (parseInt(this.response)==1) {
 				slettChildren(row);
 				row.insertAdjacentHTML('afterbegin',"<td colspan='10'><p class='red'>Arkivpakke slettet</p></td>")
 			} else {
-				document.getElementById("sokResultat").innerHTML="Noe gikk galt og arkivpakke med id "+id+" ble ikke slettet";
+				document.getElementById("sokResultat").innerHTML=this.response;
 			}
 		},"php/arkivpakkeSlett.php","arkivpakkeID="+id);	
 	}
