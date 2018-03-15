@@ -322,7 +322,7 @@ function arkivpakkeTabellRad(arkivpakkeObjekt){
 	//td element med anchor som linker til nedlastning av arkivpakkefil
 	var filLink = document.createElement("a");
 	filLink.setAttribute("href","/php/hentFil.php?arkivID="+arkivpakkeObjekt.arkivID);
-	filLink.innerHTML = "Fil";
+	filLink.innerHTML = arkivpakkeObjekt.filnavn+"-"+Math.ceil(arkivpakkeObjekt.filstørrelse)+"kB";
 	var filTD = document.createElement("td");
 	filTD.appendChild(filLink);
 	rad.appendChild(filTD);

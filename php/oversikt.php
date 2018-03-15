@@ -3,10 +3,12 @@ require_once 'hjelpeFunksjoner.php';
 session_start();
 if(isset($_SESSION['brukernavn'])&&isset($_POST['antall'])){
 	$antall = $_POST['antall'];
-	$query = 'SELECT k.kommuneNavn,a.statusTekst,a.startDato,a.sluttDato,a.sistEndret,a.dokfil,a.arkivID
+	$query = 'SELECT k.kommuneNavn,a.statusTekst,a.startDato,a.sluttDato,a.sistEndret,a.dokfil,a.arkivID,d.filnavn,d.filstørrelse
 	FROM arkivpakke a
 	INNER join kommune k
 	ON a.arkivskaper = k.kommuneNr
+	INNER join doklager d
+	ON a.dokfil = d.filID
 	ORDER BY a.sluttDato DESC
 	LIMIT ?';
 	$result = databaseKobling($query,'i',array($antall));
