@@ -248,3 +248,12 @@ td.arkivpakkeLoggTabellSamling{
 #arkivpakkeTabell tr.arkivpakkeEndringOppdatert{
 	background-color: rgba(255,255,130,0.3); 
 }
+table.slettetArkivpakker{
+	font-size: 1.1em;
+	width: auto;
+	margin: auto;
+}
+table.slettetArkivpakker td{
+	border:solid 1px black;
+	padding: 5px;
+}

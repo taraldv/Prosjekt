@@ -422,7 +422,36 @@ function settInnArkivpakkeSøk(antall) {
 
 	//Knytter en funksjon som setter inn arkivpakker som har blitt slettet til knappen 'slettetArkivpakker'
 	document.getElementById("slettetArkivpakker").addEventListener("click",function(){
-		httpPost(settInnArkivpakkeOversikt,"php/oversikt.php","slettet=slettet");
+		httpPost(function(){
+
+			var data = JSON.parse(this.response);
+			var table = document.createElement("table");
+			var theader = document.createElement("th");
+			theader.innerHTML="Arkivpakker som har blitt slettet";
+			theader.setAttribute("colspan","2");
+			table.appendChild(theader);
+			table.id = "arkivpakketabell";
+			table.className = "slettetArkivpakker";
+			for (var i = 0; i < data.length; i++) {
+				var rad = document.createElement("tr");
+				rad.setAttribute("data",data[i].arkivID);
+				var loggTD = document.createElement("td");
+				loggTD.className = "logg";
+				loggTD.innerHTML = "Logg";
+				loggTD.addEventListener("click",settInnArkivpakkeLogg);
+				var arkivID = document.createElement("td");
+				arkivID.innerHTML = "Arkivpakke nummer: "+data[i].arkivID;
+				rad.appendChild(arkivID);
+				rad.appendChild(loggTD);
+				table.appendChild(rad);
+			}
+
+			slettNode(document.getElementById("arkivpakkeTabell"));
+			slettNode(document.getElementById("antallSøkResultater"));
+
+			document.getElementById("innhold").appendChild(table);
+
+		},"php/oversikt.php","slettet=slettet");
 	});
 
 	//Når knappen trykkes på kjører funksjonen 'arkivpakkeSøk'
