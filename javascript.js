@@ -157,13 +157,11 @@ function settInnArkivpakkeEndring(){
 
 		var html = "<tr data='"+arkivpakkeID+"' id='endreArkivpakkeRow"+arkivpakkeID+"' class='endreArkivpakkeRow'>"
 		+"<td>Endre arkivpakke</td>"
-		+"<td><input type='text' id='endreArkivpakkeAnsvarlig"+arkivpakkeID+"' value='"+children[1].innerHTML+"'></td>"
 		+"<td><select id='endreArkivpakkeStatusSelect"+arkivpakkeID+"'>"+options+"</select></td>"
-		+"<td>"+children[3].innerHTML+"</td>"
-		+"<td><input type='text' id='endreArkivpakkeSluttDato"+arkivpakkeID+"' value='"+children[4].innerHTML+"'></td>"
-		+"<td colspan='3'><input type='file' id='endreArkivpakkeFil"+arkivpakkeID+"'></td>"
-		+"<td colspan='1' ><button id='endreArkivpakkeBekreft"+arkivpakkeID+"'>Bekreft</button></td>"
-		+"<td colspan='1' ><button id='endreArkivpakkeAvbryt"+arkivpakkeID+"'>Avbryt</button></td>"
+		+"<td>"+children[2].innerHTML+"</td>"
+		+"<td><input type='text' id='endreArkivpakkeSluttDato"+arkivpakkeID+"' value='"+children[3].innerHTML+"'></td>"
+		+"<td colspan='2' ><button id='endreArkivpakkeBekreft"+arkivpakkeID+"'>Bekreft</button></td>"
+		+"<td colspan='2' ><button id='endreArkivpakkeAvbryt"+arkivpakkeID+"'>Avbryt</button></td>"
 		+"</tr>";
 
 		//Setter inn html etter valgt rad element
@@ -307,6 +305,7 @@ function settInnArkivpakkeOversikt(){
 
 //Lager ett ferdig rad element som settes inn i tabell, brukes i arkivoversikt og arkivendring
 function arkivpakkeTabellRad(arkivpakkeObjekt){
+	console.log(arkivpakkeObjekt);
 	var rad = document.createElement("tr");
 	rad.setAttribute("data",arkivpakkeObjekt.arkivID);
 	rad.id = "arkivpakkeRad"+arkivpakkeObjekt.arkivID;

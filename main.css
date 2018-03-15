@@ -204,6 +204,9 @@ tr.endreArkivpakkeRow{
 .endreArkivpakkeRow input[type="text"]{
 	width: 100px;
 }
+.endreArkivpakkeRow select{
+	width: 200px;
+}
 #arkivpakkeLoggTabell{
 	margin-top: 50px;
 }
