@@ -77,7 +77,7 @@ function settInnArkivpakkeLogg(){
 			document.getElementById("sokResultat").innerHTML = "Arkivpakke med id "+arkivpakkeID+" har ingen logg";
 		} else {
 			tømInnhold();
-
+			document.getElementById("innhold").insertAdjacentHTML('beforeend',"<p id='arkivpakkelogg'>Arkivpakkenummer "+arkivpakkeID+" logg</p>");
 			var html = "<table id='arkivpakkeLoggTabell'><tbody><tr>"
 			+"<th>Sist endret</th>"
 			+"<th>Arkivskaper</th>"
@@ -103,18 +103,21 @@ function settInnArkivpakkeLogg(){
 				
 				html += "<td class='arkivpakkeLoggTabellSamling'>"+tempObj.sistEndret+"</td>";
 
-				html += loggSammenligning(arkivskaper,tempObj.arkivskaper);
-				arkivskaper = tempObj.arkivskaper;
+				if(!tempObj.arkivskaper){
+					html +="<td class='arkivpakkeLoggSlettet' colspan='4'>SLETTET</td>";
+				} else{	
+					html += loggSammenligning(arkivskaper,tempObj.arkivskaper);
+					arkivskaper = tempObj.arkivskaper;
 
-				html += loggSammenligning(statusTekst,tempObj.statusTekst);
-				statusTekst = tempObj.statusTekst;
+					html += loggSammenligning(statusTekst,tempObj.statusTekst);
+					statusTekst = tempObj.statusTekst;
 
-				html += loggSammenligning(startDato,tempObj.startDato);
-				startDato = tempObj.startDato;
+					html += loggSammenligning(startDato,tempObj.startDato);
+					startDato = tempObj.startDato;
 
-				html += loggSammenligning(sluttDato,tempObj.sluttDato);
-				sluttDato = tempObj.sluttDato;
-				
+					html += loggSammenligning(sluttDato,tempObj.sluttDato);
+					sluttDato = tempObj.sluttDato;
+				}
 				html += loggSammenligning(endretAv,tempObj.endretAv);
 				endretAv = tempObj.endretAv;
 				

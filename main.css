@@ -204,8 +204,11 @@ th{
 #arkivpakkeTabellBody select{
 	width: 150px;
 }
+#arkivpakkelogg{
+	font-size: 1.3em;
+}
 #arkivpakkeLoggTabell{
-	margin-top: 50px;
+	margin-top: 5px;
 }
 #arkivpakkeLoggTabell tr{
 	border:0;
@@ -224,6 +227,10 @@ th{
 }
 td.arkivpakkeLoggTabellSamling{
 	border-top: 1px solid black;
+}
+td.arkivpakkeLoggSlettet{
+	border-top: 1px solid black;
+	text-align: center;
 }
 #antallArkivpakker button{
 	padding: 5px;
