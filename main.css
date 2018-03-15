@@ -198,20 +198,14 @@ th{
 	background-color: rgb(255, 100, 100);
 	cursor: pointer;
 }
-tr.endreArkivpakkeRow{
-	background-color: rgba(130,130,255,0.3); 
-}
-.endreArkivpakkeRow input[type="text"]{
+#arkivpakkeTabellBody  input[type="text"]{
 	width: 100px;
 }
-.endreArkivpakkeRow select{
-	width: 200px;
+#arkivpakkeTabellBody select{
+	width: 150px;
 }
 #arkivpakkeLoggTabell{
 	margin-top: 50px;
-}
-#arkivpakkeTabell tr.arkivpakkeRadEndret {
-	background-color: rgba(255,255,130,0.3); 
 }
 #arkivpakkeLoggTabell tr{
 	border:0;
@@ -250,4 +244,7 @@ td.arkivpakkeLoggTabellSamling{
 	color:#e1ffff;
 	margin: auto;
 	vertical-align: middle;
+}
+#arkivpakkeTabell tr.arkivpakkeEndringOppdatert{
+	background-color: rgba(255,255,130,0.3); 
 }

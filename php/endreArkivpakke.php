@@ -1,55 +1,25 @@
 <?php
 require_once 'hjelpeFunksjoner.php';
 session_start();
-if (isset($_SESSION['brukernavn']) && isset($_POST['validering'])) {
-
-	
-	$query = 'SELECT 1 FROM bruker WHERE brukernavn = ?';
-	$result = databaseKobling($query,'s',array($_POST['ansvarlig']));
-	echo json_encode($result);
-} elseif (isset($_SESSION['brukernavn'])) {
-	$arkivID = $_POST['arkivID'];
-	$ansvarligID = databaseKobling('SELECT brukerID FROM bruker WHERE brukernavn = ?','s',array($_POST['ansvarlig']));
+if (isset($_SESSION['brukernavn']) && isset($_POST['statusTekst'])) {
 	$brukerID = databaseKobling('SELECT brukerID FROM bruker WHERE brukernavn = ?','s',array($_SESSION['brukernavn']));
-	$statusTekst = $_POST['statusTekst'];
-	//$startDato = $_POST['startDato'];
-	//$kommuneID = databaseKobling('SELECT kommuneNr FROM kommune WHERE kommunenavn = ?','s',array($_POST['kommune']));
-	$sluttDato = $_POST['sluttDato'];
-	$arkivpakkeQuery;
-	$array;
-	$type;
-	if ($_FILES) {
-		$filnavn = $_FILES['fil']['name'];
-		$filstr = $_FILES['fil']['size']/1000;
-		$doklagerQuery = 'INSERT INTO doklager(filnavn,filstørrelse) VALUES(?,?)';
-		$dokID = databaseKobling($doklagerQuery,'sd',array($filnavn,$filstr));
-		$unikFilnavn = "$dokID.$filnavn";
-		$dir = '/home/skule/doklager/';
-		if (!move_uploaded_file($_FILES['fil']['tmp_name'],"$dir$unikFilnavn")) {
-			die("Noe gikk galt med filopplastning, endring avbrutt");
-		} else {
-			$arkivpakkeQuery = 'UPDATE arkivpakke SET ansvarlig = ?, statusTekst = ?, sluttDato = ?, sistEndret = CURRENT_TIMESTAMP(), endretAv = ?, dokfil = ? WHERE arkivID = ?';
-			$array = array($ansvarligID[0]['brukerID'],$statusTekst,$sluttDato,$brukerID[0]['brukerID'],$dokID,$arkivID);
-			$type = 'issiii';
-		}
-	} else {
-		$arkivpakkeQuery = 'UPDATE arkivpakke SET ansvarlig = ?, statusTekst = ?, sluttDato = ?, sistEndret = CURRENT_TIMESTAMP(), endretAv = ? WHERE arkivID = ?';
-		$array = array($ansvarligID[0]['brukerID'],$statusTekst,$sluttDato,$brukerID[0]['brukerID'],$arkivID);
-		$type = 'issii';
-	}
-	$result = databaseKobling($arkivpakkeQuery,$type,$array);
+	$kommuneNr = databaseKobling('SELECT kommuneNr FROM kommune WHERE kommunenavn = ?','s',array($_POST['arkivskaper']));
+	$arkivID = $_POST['arkivID'];
+	$query = 'UPDATE arkivpakke SET arkivskaper = ?, statusTekst = ?, startDato = ?, sluttDato = ?, sistEndret = CURRENT_TIMESTAMP(), endretAv = ? WHERE arkivID = ?';
+	$array = array($kommuneNr[0]['kommuneNr'],$_POST['statusTekst'],$_POST['startDato'],$_POST['sluttDato'],$brukerID[0]['brukerID'],$arkivID);
+	$result = databaseKobling($query,'isssii',$array);
 	if ($result > 0) {
-		$oppdatertQuery = 'SELECT k.kommuneNavn,b.brukerNavn,a.statusTekst,a.startDato,a.sluttDato,a.sistEndret,a.dokfil,a.arkivID
+		$oppdatertQuery = 'SELECT k.kommuneNavn,a.statusTekst,a.startDato,a.sluttDato,a.sistEndret,a.dokfil,a.arkivID,d.filnavn,d.filstørrelse
 		FROM arkivpakke a
-		INNER JOIN bruker b
-		ON a.ansvarlig = b.brukerID
 		INNER join kommune k
 		ON a.arkivskaper = k.kommuneNr
-		WHERE a.arkivID = ?';
+		INNER join doklager d
+		ON a.dokfil = d.filID
+		WHERE arkivID = ?';
 		$oppdatertResultat = databaseKobling($oppdatertQuery,'i',array($arkivID));
 		echo json_encode($oppdatertResultat);
 	} else {
-		echo 0;
+		echo $result;
 	}
 }
 ?>

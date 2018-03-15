@@ -135,41 +135,50 @@ function settInnArkivpakkeEndring(){
 	var parentNode = this.parentNode;
 	var arkivpakkeID = parentNode.getAttribute('data');
 
-	//Henter arkivpakkestatus til raden
+	//Henter en nodeList av alle elementer fra <tr>
 	var children = parentNode.childNodes;
-	var selected = children[2].innerHTML;
+	
 
 	//http post request som henter statustyper
 	httpPost(function(){
-		slettNode(document.getElementById("endreArkivpakkeRow"+arkivpakkeID));
 		var options = "";
 		var data = JSON.parse(this.response);
 
 		//Går igjennom statustypene og setter den som allerede arkivpakken har til 'selected' i dropdown menyen
 		for (var key in data) {
-			if (data[key].statusTekst == selected) {
+			if (data[key].statusTekst == children[1].innerHTML) {
 				options += "<option selected>"+data[key].statusTekst+"</option>";
 			} else {
 				options += "<option>"+data[key].statusTekst+"</option>";
 			}
-			
 		}
 
-		var html = "<tr data='"+arkivpakkeID+"' id='endreArkivpakkeRow"+arkivpakkeID+"' class='endreArkivpakkeRow'>"
-		+"<td>Endre arkivpakke</td>"
-		+"<td><select id='endreArkivpakkeStatusSelect"+arkivpakkeID+"'>"+options+"</select></td>"
-		+"<td>"+children[2].innerHTML+"</td>"
-		+"<td><input type='text' id='endreArkivpakkeSluttDato"+arkivpakkeID+"' value='"+children[3].innerHTML+"'></td>"
-		+"<td colspan='2' ><button id='endreArkivpakkeBekreft"+arkivpakkeID+"'>Bekreft</button></td>"
-		+"<td colspan='2' ><button id='endreArkivpakkeAvbryt"+arkivpakkeID+"'>Avbryt</button></td>"
-		+"</tr>";
+		var endreInput = "<td><input type='text' placeholder='"+children[0].innerHTML+"'></td>"
+		+"<td><select>"+options+"</select></td>"
+		+"<td><input type='text' placeholder='"+children[2].innerHTML+"'></td>"
+		+"<td><input type='text' placeholder='"+children[3].innerHTML+"'></td>"
+		
+		+"<td colspan='1' ><button id='endreArkivpakkeBekreft"+arkivpakkeID+"'>Bekreft endring</button></td>"
+		+"<td colspan='1' ><button id='endreArkivpakkeAvbryt"+arkivpakkeID+"'>Avbryt</button></td>"
+		+"<td colspan='3'></td>";
 
-		//Setter inn html etter valgt rad element
-		parentNode.insertAdjacentHTML('afterend',html);
+		//Lager en kopi av den originale raden før sletting/innsetting
+		var arr = [];
+		for (var i = 0; i < children.length; i++) {
+			arr.push(children[i]);
+		}
 
-		//Knytter knappen 'endreArkivpakkeAvbryt' til en eventListener som sletter denne nye endrings raden
+		//Sletter alle de originale elementer og setter inn html av de nye
+		slettChildren(parentNode);
+		parentNode.insertAdjacentHTML('afterbegin',endreInput);
+
+
+		//Knytter knappen 'endreArkivpakkeAvbryt' til en eventListener som sletter de nye elementene og setter inn kopien av de originale
 		document.getElementById("endreArkivpakkeAvbryt"+arkivpakkeID).addEventListener("click",function(){
-			slettNode(document.getElementById("endreArkivpakkeRow"+arkivpakkeID));
+			slettChildren(parentNode);
+			for (var i = 0; i < arr.length; i++) {
+				parentNode.appendChild(arr[i]);
+			}
 		});
 
 		//Knytter knappen 'endreArkivpakkeBekreft' til en eventListener som kjører funksjonen 'sendArkivpakkeEndring'
@@ -177,69 +186,57 @@ function settInnArkivpakkeEndring(){
 	},"php/leggTilArkivpakke.php","statustype=statustype");
 }
 
+
 //TODO: lag funksjon som kan brukes av ny arkivpakke og arkivpakke endring, dette er en kopi med små endringer.
 function sendArkivpakkeEndring(){
+
+	//Funksjon som sjekker om input har en verdi tekst lengre enn 0
+	//og sender tilbake verdi eller placeholder tekst avhengig av resultat
+	function inputTekst(inputNode){
+		if (inputNode.value.length>0) {
+			return inputNode.value;
+		} else{
+			return inputNode.getAttribute("placeholder");
+		}
+	}
+
+	//Henter data fra <tr> elementet som skal sendes til endreArkivpakke.php
 	var parentNode = this.parentNode.parentNode;
 	var arkivpakkeID = parentNode.getAttribute('data');
-	var filInput = document.getElementById("endreArkivpakkeFil"+arkivpakkeID);
-	var fil = filInput.files[0];
-	var ansvarligInput = document.getElementById("endreArkivpakkeAnsvarlig"+arkivpakkeID);
-	var statusTekstSelect = document.getElementById("endreArkivpakkeStatusSelect"+arkivpakkeID);
+	var arkivskaper = inputTekst(parentNode.childNodes[0].childNodes[0]);
+	var statusTekstSelect = parentNode.childNodes[1].childNodes[0];
 	var statusTekst = statusTekstSelect[statusTekstSelect.selectedIndex].value;
-	var sluttDatoInput = document.getElementById("endreArkivpakkeSluttDato"+arkivpakkeID);
-	httpPost(function(){
-		//Resetter validity
-		ansvarligInput.setCustomValidity("");
-		//startDatoInput.setCustomValidity("");
-		sluttDatoInput.setCustomValidity("");
-		//Regex som matcher 4 tall - 1 eller 2 tall - 1 eller 2 tall
-		var regex = /\d{4}-\d{1,2}-\d{1,2}/;  
+	var startDato = inputTekst(parentNode.childNodes[2].childNodes[0]);
+	var sluttDato = inputTekst(parentNode.childNodes[3].childNodes[0]);
 
-		//I stedet for regex som sjekker etter skuddår gjøres string om til dato
-		//Date.parse returnerer NaN hvis ugyldig
-		//var startDato = Date.parse(regex.exec(startDatoInput.value));
-		var sluttDato = Date.parse(regex.exec(sluttDatoInput.value));
+	//Sjekker og endrer dato input sin validity
+	inputValidering(parentNode.childNodes[2].childNodes[0],gyldigDato(startDato),"Uglydig dato");
+	inputValidering(parentNode.childNodes[3].childNodes[0],gyldigDato(sluttDato),"Uglydig dato");
 
-		//Må visst bruke formData for å sende fil uten en HTML form
-		var formData = new FormData();
-		formData.append("ansvarlig", ansvarligInput.value);
-		//formData.append("startDato", startDatoInput.value); 
-		formData.append("arkivID",arkivpakkeID);
-		formData.append("sluttDato", sluttDatoInput.value);
-		formData.append("statusTekst", statusTekst); 
-		formData.append("fil", fil);
+	//Hvis begge input er gyldig sendes data til endreArkivpakke.php
+	if (parentNode.childNodes[2].childNodes[0].checkValidity() && parentNode.childNodes[3].childNodes[0].checkValidity()) {
 
-		//Sjekker om kommune og datoer er gyldige
-		if (JSON.parse(this.response).length>0 /*&& !isNaN(startDato) */&& !isNaN(sluttDato)) {
-			slettNode(document.getElementById("endreArkivpakkeRow"+arkivpakkeID));
-			httpPost(function(){
-				if (JSON.parse(this.response)==0){
-					document.getElementById("sokResultat").innerHTML = "Arkivpakke endring ble mislykket";
-				} else {
-					var oppdatertArkivpakke = JSON.parse(this.response);
-					var nyArkivpakkeTabellRadNode = arkivpakkeTabellRad(oppdatertArkivpakke[0]);
-					nyArkivpakkeTabellRadNode.className = "arkivpakkeRadEndret";
-					var tbody = document.getElementById("arkivpakkeTabellBody");
-					var gammelArkivpakkeTabellRadNode = document.getElementById("arkivpakkeRad"+arkivpakkeID);
-					tbody.replaceChild(nyArkivpakkeTabellRadNode,gammelArkivpakkeTabellRadNode);
-					document.getElementById("sokResultat").innerHTML = "Arkivpakke med id "+arkivpakkeID+" har blitt endret";
-					//slettNode(parentNode);
-				}
-			},"php/endreArkivpakke.php",formData,true);
-		};
-		if (JSON.parse(this.response)==0) {
-			ansvarligInput.setCustomValidity("Ugyldig bruker");
-		}
-		/*if (isNaN(startDato) || !regex.exec(startDatoInput.value)) {
-			startDatoInput.setCustomValidity("Ugyldig dato");
-		}*/
-		if (isNaN(sluttDato) || !regex.exec(sluttDatoInput.value)) {
-			sluttDatoInput.setCustomValidity("Ugyldig dato");
-		}
-		if (fil && fil.size>1000000) {
-			filInput.setCustomValidity("Fil for stor");
-		}
-	},"php/endreArkivpakke.php","validering=validering&ansvarlig="+ansvarligInput.value);
+		var parameter = "arkivID="+arkivpakkeID
+		+"&arkivskaper="+arkivskaper
+		+"&statusTekst="+statusTekst
+		+"&startDato="+startDato
+		+"&sluttDato="+sluttDato;
+
+		httpPost(function(){
+			if (sjekkJSONresponse(this.response)) {
+				var data = JSON.parse(this.response);
+				var oppdatertRad = arkivpakkeTabellRad(data[0]);
+				oppdatertRad.className = "arkivpakkeEndringOppdatert";
+				var nesteRad = parentNode.nextSibling;
+				slettNode(parentNode);
+				nesteRad.parentNode.insertBefore(oppdatertRad, nesteRad);
+				document.getElementById("sokResultat").innerHTML="Arkivpakke med ID: "+arkivpakkeID+" har blitt oppdatert";
+			} else {
+				document.getElementById("sokResultat").innerHTML="Arkivpakke ble ikke oppdatert "+this.response;
+			}
+
+		},"php/endreArkivpakke.php",parameter);
+	}
 }
 //TODO erstatte med form og php
 function sendInnNyArkivpakke(){
@@ -305,7 +302,7 @@ function settInnArkivpakkeOversikt(){
 
 //Lager ett ferdig rad element som settes inn i tabell, brukes i arkivoversikt og arkivendring
 function arkivpakkeTabellRad(arkivpakkeObjekt){
-	console.log(arkivpakkeObjekt);
+	//console.log(arkivpakkeObjekt);
 	var rad = document.createElement("tr");
 	rad.setAttribute("data",arkivpakkeObjekt.arkivID);
 	rad.id = "arkivpakkeRad"+arkivpakkeObjekt.arkivID;
@@ -510,11 +507,7 @@ function oppdaterPassord(){
 	//(svar fra php er enten 1 eller 0) og endrer input sin validity
 	httpPost(function(){
 		var inputField = document.getElementById("gammeltPassord");
-		if (parseInt(this.response)==1) {
-			inputField.setCustomValidity("");
-		} else {
-			inputField.setCustomValidity("Matcher ikke gammelt passord");
-		}
+		inputValidering(inputField,parseInt(this.response)==1,"Matcher ikke gammelt passord");
 	},"php/endrePassord.php","gammeltPassord="+gammeltPassordInput.value);
 
 	//Sjekker om input er valid
@@ -553,6 +546,15 @@ function slettChildren(node){
 	}
 }
 
+function sjekkJSONresponse(json) {
+	try {
+		JSON.parse(json);
+	} catch (SyntaxError) {
+		return false;
+	}
+	return true;
+}
+
 //Fjerner alle nodes fra 'innhold' utenom den første som skal være 'login'
 function tømInnhold(){
 	var list = document.getElementById("innhold").childNodes;
@@ -569,12 +571,6 @@ function slettNode(node){
 	}
 }
 
-//Sender tilbake ordet med første bokstav som stor
-function storBokstav(ord){
-	var stor = ord.charAt(0).toUpperCase();
-	return stor+ord.substring(1);
-}
-
 //Sender tilbake en top td element hvis objektene er like
 function loggSammenligning(objekt,tempObjekt){
 	if (objekt==tempObjekt) {
@@ -587,8 +583,15 @@ function loggSammenligning(objekt,tempObjekt){
 function inputValidering(inputNode,boolean,errorTekst){
 	inputNode.setCustomValidity("");
 	inputNode.parentNode.classList.remove("has-error");
-	if (boolean) {
+	if (!boolean) {
 		inputNode.setCustomValidity(errorTekst);
 		inputNode.parentNode.classList.add("has-error");
 	}
+}
+
+//Bruker regex til å sjekke at verdien er korrekt satt opp, og Date.parse til å sjekke at verdien er en dato.
+function gyldigDato(datoVerdi){
+	var regex = /\d{4}-\d{1,2}-\d{1,2}/;  
+	var dato = Date.parse(regex.exec(datoVerdi));
+	return !isNaN(dato);
 }
