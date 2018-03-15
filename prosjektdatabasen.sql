@@ -152,14 +152,6 @@ BEGIN
 	VALUES(NEW.arkivID,NEW.arkivskaper,NEW.statusTekst,NEW.startDato,NEW.sluttDato,NEW.sistEndret,NEW.endretAv);
 END::
 
- /*CREATE TRIGGER arkivpakkeBRD
- BEFORE DELETE ON arkivpakke
- FOR EACH ROW
- BEGIN
-	INSERT INTO logg(arkivID,arkivskaper,statusTekst,startDato,sluttDato,sistEndret,endretAv)
-	VALUES(NEW.arkivID,NEW.arkivskaper,NEW.statusTekst,NEW.startDato,NEW.sluttDato,NEW.sistEndret,NEW.endretAv);
- END::*/
-
 CREATE PROCEDURE slettArkivpakke
 (
 	IN p_arkivID INTEGER,
@@ -610,7 +602,9 @@ INSERT INTO bruker
 /*passord=chr*/
 VALUES('chr','$2y$10$MMCHDo75Vwme2.AN5ipcCOnyqq/w5Q3qaG9XNfArR3YvtrxaHFZYK','cecilie','hansen rørås'),
 /*passord=123*/
-('tv','$2y$10$RRB1SmieMcqIL1fqzNWP/ub06b4VNi3lBLX1J2/dH7BZcWp5M6zEC','tarald','vestbøstad');
+('tv','$2y$10$RRB1SmieMcqIL1fqzNWP/ub06b4VNi3lBLX1J2/dH7BZcWp5M6zEC','tarald','vestbøstad'),
+/*passord=olav*/
+('olav','$2y$10$/PRHBHkwLEQ/gxwo8MatBOITEAavGJovd74yD0MyDTzU1QV0QWdBK','olav','aleksander lysenstøen');
 
 INSERT INTO statustype
 VALUES('avtalt'),
@@ -622,92 +616,93 @@ VALUES('avtalt'),
 ('i dsm');
 
 INSERT INTO doklager(filnavn,filstørrelse)
-VALUES ('Halden.xml',1.1),
-('Gjerstad.xml',1.1),
-('Tysnes.xml',1.1),
-('Meldal.xml',1.1),
-('Tingvoll.xml',1.1),
-('Hvaler.xml',1.1),
-('Dyrøy.xml',1.1),
-('Luster.xml',1.1),
-('Vågan.xml',1.1),
-('Stor-Elvdal.xml',1.1),
-('Bykle.xml',1.1),
-('Gjesdal.xml',1.1),
-('Bokn.xml',1.1),
-('Norddal.xml',1.1),
-('Finnøy.xml',1.1),
-('Bremanger.xml',1.1),
-('Kragerø.xml',1.1),
-('Rælingen.xml',1.1),
-('Lier.xml',1.1),
-('Herøy i Nordland.xml',1.1),
-('Steinkjer.xml',1.1),
-('Åseral.xml',1.1),
-('Nord-Odal.xml',1.1),
-('Aukra.xml',1.1),
-('Tydal.xml',1.1),
-('Alstahaug.xml',1.1),
-('Gloppen.xml',1.1),
-('Rennebu.xml',1.1),
-('Lurøy.xml',1.1),
-('Sømna.xml',1.1),
-('Sauda.xml',1.1),
-('Kongsvinger.xml',1.1),
-('Sømna.xml',1.1),
-('Inderøy.xml',1.1),
-('Nore og Uvdal.xml',1.1),
-('Risør.xml',1.1),
-('Ørsta.xml',1.1),
-('Nannestad.xml',1.1),
-('Sigdal.xml',1.1),
-('Leka.xml',1.1);
+VALUES ('Folldal.xml',3.978),
+('Eidskog.xml',3.723),
+('Bygland.xml',1.734),
+('Beiarn.xml',4.866),
+('Kvinnherad.xml',4.784),
+('Alstahaug.xml',3.241),
+('Rollag.xml',2.836),
+('Overhalla.xml',2.895),
+('Rendalen.xml',2.297),
+('Hobøl.xml',4.339),
+('Lenvik.xml',1.583),
+('Haugesund.xml',3.543),
+('Averøy.xml',1.482),
+('Fitjar.xml',1.627),
+('Stordal.xml',1.105),
+('Sigdal.xml',2.199),
+('Nore og Uvdal.xml',3.764),
+('Rauma.xml',3.62),
+('Rollag.xml',4.689),
+('Dønna.xml',1.079),
+('Åfjord.xml',1.854),
+('Nore og Uvdal.xml',2.882),
+('Hemsedal.xml',4.02),
+('Etne.xml',1.723),
+('Vadsø.xml',2.335),
+('Fosnes.xml',2.398),
+('Sokndal.xml',2.256),
+('Askvoll.xml',1.192),
+('Ringsaker.xml',4.635),
+('Åsnes.xml',1.326),
+('Spydeberg.xml',1.443),
+('Frøya.xml',3.308),
+('Lesja.xml',3.137),
+('Meldal.xml',3.096),
+('Ibestad.xml',1.445),
+('Andøy.xml',1.084),
+('Fauske – Fuossko.xml',1.795),
+('Åfjord.xml',3.899),
+('Nannestad.xml',2.836),
+('Namsos.xml',2.904);
 
 INSERT INTO arkivpakke(arkivskaper, statusTekst, startDato, sluttDato, sistEndret, endretAv, dokfil)
-VALUES (101,'avtalt','2001-4-14','2003-3-10',CURRENT_TIMESTAMP(),1,1),
-(911,'avtalt','2005-1-17','2006-11-21',CURRENT_TIMESTAMP(),1,2),
-(1223,'avtalt','2014-4-24','2016-5-28',CURRENT_TIMESTAMP(),2,3),
-(5023,'i test','2002-9-19','2017-2-11',CURRENT_TIMESTAMP(),1,4),
-(1560,'i test','2005-6-15','2007-6-19',CURRENT_TIMESTAMP(),1,5),
-(111,'avtalt','2006-9-4','2013-4-20',CURRENT_TIMESTAMP(),2,6),
-(1926,'i dsm','2002-5-22','2006-2-12',CURRENT_TIMESTAMP(),1,7),
-(1426,'i test','2003-2-11','2010-1-1',CURRENT_TIMESTAMP(),2,8),
-(1865,'avvist, venter ny deponering','2007-6-10','2011-3-4',CURRENT_TIMESTAMP(),2,9),
-(430,'mottatt','2005-6-24','2006-7-5',CURRENT_TIMESTAMP(),2,10),
-(941,'avtalt','2003-3-28','2013-7-9',CURRENT_TIMESTAMP(),1,11),
-(1122,'i dsm','2000-1-25','2006-4-7',CURRENT_TIMESTAMP(),2,12),
-(1145,'i karantene','2001-7-17','2011-1-6',CURRENT_TIMESTAMP(),1,13),
-(1524,'godkjent','2001-7-11','2003-1-27',CURRENT_TIMESTAMP(),2,14),
-(1141,'avtalt','2005-9-10','2006-6-19',CURRENT_TIMESTAMP(),1,15),
-(1438,'i karantene','2001-9-9','2007-11-10',CURRENT_TIMESTAMP(),2,16),
-(815,'godkjent','2006-1-7','2008-11-19',CURRENT_TIMESTAMP(),2,17),
-(228,'i test','2011-4-27','2017-11-15',CURRENT_TIMESTAMP(),1,18),
-(626,'avvist, venter ny deponering','2009-5-4','2012-1-13',CURRENT_TIMESTAMP(),2,19),
-(1818,'i karantene','2002-4-2','2017-10-20',CURRENT_TIMESTAMP(),2,20),
-(5004,'mottatt','2010-1-28','2012-1-16',CURRENT_TIMESTAMP(),2,21),
-(1026,'i dsm','2008-9-3','2009-11-28',CURRENT_TIMESTAMP(),2,22),
-(418,'i dsm','2015-3-4','2016-9-19',CURRENT_TIMESTAMP(),2,23),
-(1547,'i test','2000-10-26','2014-3-3',CURRENT_TIMESTAMP(),1,24),
-(5033,'i test','2002-6-12','2009-2-12',CURRENT_TIMESTAMP(),2,25),
-(1820,'mottatt','2006-3-13','2013-3-8',CURRENT_TIMESTAMP(),2,26),
-(1445,'i karantene','2001-9-21','2016-10-16',CURRENT_TIMESTAMP(),2,27),
-(5022,'i test','2010-11-4','2015-7-28',CURRENT_TIMESTAMP(),1,28),
-(1834,'i dsm','2014-4-27','2015-1-27',CURRENT_TIMESTAMP(),1,29),
-(1812,'godkjent','2001-8-28','2005-6-7',CURRENT_TIMESTAMP(),1,30),
-(1135,'godkjent','2006-7-27','2011-6-3',CURRENT_TIMESTAMP(),2,31),
-(402,'i test','2002-7-21','2017-9-20',CURRENT_TIMESTAMP(),2,32),
-(1812,'mottatt','2007-3-12','2015-9-28',CURRENT_TIMESTAMP(),1,33),
-(5053,'mottatt','2009-2-2','2012-11-5',CURRENT_TIMESTAMP(),1,34),
-(633,'i dsm','2008-11-17','2009-6-6',CURRENT_TIMESTAMP(),2,35),
-(901,'godkjent','2013-7-9','2014-3-27',CURRENT_TIMESTAMP(),2,36),
-(1520,'i karantene','2010-2-24','2015-11-18',CURRENT_TIMESTAMP(),2,37),
-(238,'i karantene','2012-3-23','2016-9-14',CURRENT_TIMESTAMP(),1,38),
-(621,'i test','2014-4-23','2017-8-8',CURRENT_TIMESTAMP(),1,39),
-(5052,'avvist, venter ny deponering','2012-1-27','2013-10-17',CURRENT_TIMESTAMP(),2,40);
+VALUES (439,'i dsm','2002-6-19','2008-8-25',CURRENT_TIMESTAMP(),3,1),
+(420,'godkjent','2002-2-23','2011-4-25',CURRENT_TIMESTAMP(),3,2),
+(938,'i dsm','2007-5-10','2015-8-27',CURRENT_TIMESTAMP(),2,3),
+(1839,'mottatt','2008-7-22','2011-9-15',CURRENT_TIMESTAMP(),3,4),
+(1224,'mottatt','2006-10-17','2010-8-10',CURRENT_TIMESTAMP(),3,5),
+(1820,'i test','2001-11-12','2006-10-2',CURRENT_TIMESTAMP(),3,6),
+(632,'i dsm','2011-4-18','2016-2-7',CURRENT_TIMESTAMP(),1,7),
+(5047,'i dsm','2003-10-5','2008-4-1',CURRENT_TIMESTAMP(),1,8),
+(432,'i karantene','2005-2-27','2012-7-19',CURRENT_TIMESTAMP(),3,9),
+(138,'i dsm','2009-8-15','2011-11-12',CURRENT_TIMESTAMP(),3,10),
+(1931,'avtalt','2004-1-8','2010-9-20',CURRENT_TIMESTAMP(),2,11),
+(1106,'avvist, venter ny deponering','2001-8-25','2004-7-14',CURRENT_TIMESTAMP(),2,12),
+(1554,'i test','2010-4-17','2015-7-7',CURRENT_TIMESTAMP(),1,13),
+(1222,'godkjent','2000-4-16','2014-6-12',CURRENT_TIMESTAMP(),3,14),
+(1526,'godkjent','2000-8-5','2005-8-21',CURRENT_TIMESTAMP(),1,15),
+(621,'avvist, venter ny deponering','2001-7-4','2015-2-24',CURRENT_TIMESTAMP(),3,16),
+(633,'i dsm','2005-1-15','2012-1-27',CURRENT_TIMESTAMP(),2,17),
+(1539,'mottatt','2010-1-26','2017-7-2',CURRENT_TIMESTAMP(),3,18),
+(632,'godkjent','2014-4-2','2015-11-16',CURRENT_TIMESTAMP(),2,19),
+(1827,'i dsm','2004-7-10','2015-2-3',CURRENT_TIMESTAMP(),3,20),
+(5018,'i test','2007-10-26','2008-1-19',CURRENT_TIMESTAMP(),2,21),
+(633,'avvist, venter ny deponering','2001-2-27','2011-3-7',CURRENT_TIMESTAMP(),1,22),
+(618,'godkjent','2002-2-18','2007-6-10',CURRENT_TIMESTAMP(),1,23),
+(1211,'i dsm','2002-3-20','2014-8-12',CURRENT_TIMESTAMP(),1,24),
+(2003,'i test','2012-9-21','2017-9-14',CURRENT_TIMESTAMP(),3,25),
+(5048,'i dsm','2011-9-12','2017-3-28',CURRENT_TIMESTAMP(),3,26),
+(1111,'avtalt','2009-2-9','2014-11-7',CURRENT_TIMESTAMP(),1,27),
+(1428,'mottatt','2006-4-8','2007-4-5',CURRENT_TIMESTAMP(),1,28),
+(412,'avvist, venter ny deponering','2000-7-13','2003-8-15',CURRENT_TIMESTAMP(),1,29),
+(425,'i karantene','2004-10-24','2005-5-25',CURRENT_TIMESTAMP(),1,30),
+(123,'mottatt','2000-5-11','2012-3-27',CURRENT_TIMESTAMP(),3,31),
+(5014,'avvist, venter ny deponering','2004-2-6','2011-8-11',CURRENT_TIMESTAMP(),3,32),
+(512,'i karantene','2002-8-22','2012-2-23',CURRENT_TIMESTAMP(),1,33),
+(5023,'godkjent','2007-6-27','2012-1-20',CURRENT_TIMESTAMP(),3,34),
+(1917,'i dsm','2001-6-24','2006-4-19',CURRENT_TIMESTAMP(),2,35),
+(1871,'i test','2007-9-26','2011-7-18',CURRENT_TIMESTAMP(),2,36),
+(1841,'i test','2004-11-11','2017-1-7',CURRENT_TIMESTAMP(),1,37),
+(5018,'mottatt','2004-5-24','2015-5-28',CURRENT_TIMESTAMP(),2,38),
+(238,'avvist, venter ny deponering','2003-9-22','2010-5-5',CURRENT_TIMESTAMP(),1,39),
+(5005,'godkjent','2009-7-16','2012-9-10',CURRENT_TIMESTAMP(),1,40);
+
 
 UPDATE arkivpakke SET statusTekst = 'avvist, venter ny deponering',endretAv = 1 WHERE arkivID = 1;
-UPDATE arkivpakke SET sluttDato = '2015-10-22',endretAv = 1 WHERE arkivID = 2;
-UPDATE arkivpakke SET statusTekst = 'avvist, venter ny deponering',endretAv = 1 WHERE arkivID = 3;
-UPDATE arkivpakke SET sluttDato = '2018-01-22',endretAv = 2 WHERE arkivID = 4;
-UPDATE arkivpakke SET sluttDato = '2016-01-01',endretAv = 2 WHERE arkivID = 2;
-UPDATE arkivpakke SET statusTekst = 'avtalt',endretAv = 1 WHERE arkivID = 2;
+UPDATE arkivpakke SET sluttDato = '2015-10-22',endretAv = 1 WHERE arkivID = 1;
+UPDATE arkivpakke SET statusTekst = 'avvist, venter ny deponering',endretAv = 1 WHERE arkivID = 1;
+UPDATE arkivpakke SET sluttDato = '2018-01-22',endretAv = 2 WHERE arkivID = 1;
+UPDATE arkivpakke SET sluttDato = '2016-01-01',endretAv = 2 WHERE arkivID = 1;
+UPDATE arkivpakke SET statusTekst = 'avtalt',endretAv = 1 WHERE arkivID = 1;
