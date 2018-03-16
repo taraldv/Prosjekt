@@ -27,8 +27,8 @@
 	</div>
 	<footer>
 		<a href="example.com">Kontakt oss</a>
-		<a href="example.com">CSS Validering</a>
-		<a href="example.com">HTML Validering</a>
+		<a href="https://jigsaw.w3.org/css-validator/validator?uri=https%3A%2F%2Fskule.tarves.no%2Fmain.css&profile=css3svg&usermedium=all&warning=1&vextwarning=&lang=en">CSS Validering</a>
+		<a href="https://validator.w3.org/nu/?doc=https%3A%2F%2Fskule.tarves.no%2Findex.php">HTML Validering</a>
 	</footer>
 </body>
 </html>

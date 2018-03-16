@@ -187,7 +187,7 @@ th{
 	background-color: rgba(255, 100, 100, 0.5);
 }
 .logg:hover{
-	background-color: rgba(100,255,100); 
+	background-color: rgb(100,255,100); 
 	cursor: pointer;
 }
 .endre:hover{

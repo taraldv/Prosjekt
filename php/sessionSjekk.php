@@ -16,7 +16,7 @@ if (isset($_SESSION['brukernavn'])){
 } else {
 	$innlogging = "<div id='loginLeft'></div>"
 	."<div id='loginRight'>"
-		."<form action='' method='POST' id='innlogging'>"
+		."<form method='POST' id='innlogging'>"
 			."<input id='brukernavn' type='text' name='brukernavn' placeholder='Brukernavn' required>"
 			."<input id='passord' type='password' name='passord' placeholder='Passord' required>"
 			."<button type='submit' class='btn btn-default'><span class='glyphicon glyphicon-log-in'></span>Logg inn</button>"

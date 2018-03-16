@@ -452,7 +452,7 @@ function settInnLeggTilArkivpakke(){
 		}
 		var html = "<div id='leggTilArkivpakkeDiv'><h2>Legg til ny arkivpakke</h2></br>"
 
-		+"<form class='form-horizontal' id='skjema' action='' method='post' enctype='multipart/form-data'>"
+		+"<form class='form-horizontal' id='skjema' method='post' enctype='multipart/form-data'>"
 		+"<div class='form-group'>"
 		+"<label class='control-label col-sm-3' for='arkivpakkeFilInput'>Last opp METSFIL</label>"
 		+"<div class='col-sm-3 has-error'>"
