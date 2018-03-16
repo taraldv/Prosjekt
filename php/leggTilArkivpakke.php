@@ -21,6 +21,9 @@ if (isset($_SESSION['brukernavn']) && isset($_POST['statustype'])){
 	$filIDResultat = databaseKobling($arkivpakkeQuery,'sdisssi',$array);
 	$dir = '/home/skule/doklager/';
 	$filID = $filIDResultat[0]['filID'];
-	$boolean = move_uploaded_file($_FILES['fil']['tmp_name'],"$dir$filID$filnavn");
+
+	//Mangler error handling
+	move_uploaded_file($_FILES['fil']['tmp_name'],"$dir$filID$filnavn");
+	echo "<p id='arkivpakkeOpprettet'>Arkivpakke opprettet</p>";
 }
 ?>

@@ -21,6 +21,9 @@
 			require_once 'php/innlogging.php';
 			?>
 		</div>
+		<?php
+		require_once 'php/leggTilArkivpakke.php';
+		?>
 	</div>
 	<footer>
 		<a href="example.com">Kontakt oss</a>
