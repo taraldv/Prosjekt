@@ -2,7 +2,7 @@
 session_start();
 if (isset($_SESSION['brukernavn'])){
 	$navigering = "<div id='loginLeft'>"
-		."<button id='arkivpakkeSøkNavigering' class='btn btn-default'><span class='glyphicon glyphicon-search'></span>Søk i arkivpakker</button>"
+		."<button id='arkivpakkeSøkNavigering' class='btn btn-default'><span class='glyphicon glyphicon-search'></span>Arkivpakker</button>"
 		."<button id='leggTilArkivpakkeNavigering' class='btn btn-default'><span class='glyphicon glyphicon-plus'></span>Legg til ny arkivpakke</button>"
 	."</div>"
 	."<div id='loginRight'>"

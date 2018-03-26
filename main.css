@@ -1,4 +1,5 @@
-@charset "utf-8";
+	css:
+	@charset "utf-8";
 *{
 	padding:0;
 	margin:0;
@@ -232,10 +233,18 @@ td.arkivpakkeLoggSlettet{
 	text-align: center;
 }
 #antallArkivpakker button{
-	padding: 5px;
+	padding: 10px;
+	margin: 2.5px;
+	color: black;
+	background-color: #EDEDEE;
+}
+#antallArkivpakker{
+ 	margin: 35px;
 }
 #antallArkivpakker p{
+	font-weight: 600;
 	display: inline-block;
+	margin-right: 10px;
 }
 .col-sm-6{
 	margin-left: 140px;
@@ -246,6 +255,10 @@ td.arkivpakkeLoggSlettet{
 	width:50%;
 	height: 260px;
 }
+#sokResultat{
+	color:red;
+	margin:25px;
+}
 #brukeren{
 	color:#e1ffff;
 	margin: auto;
@@ -253,6 +266,11 @@ td.arkivpakkeLoggSlettet{
 }
 #arkivpakkeTabell tr.arkivpakkeEndringOppdatert{
 	background-color: rgba(255,255,130,0.3); 
+}
+#slettetArkivpakker{
+	margin: 5px;
+	color: black;
+	background-color: #EDEDEE;
 }
 table.slettetArkivpakker{
 	font-size: 1.1em;

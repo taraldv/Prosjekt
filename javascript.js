@@ -372,16 +372,23 @@ function settInnArkivpakkeSøk(antall) {
 	//Sender antall til oversikt.php og kjører 'settInnArkivpakkeOversikt' med data fra php filen
 	httpPost(settInnArkivpakkeOversikt,"php/oversikt.php","antall="+antall);
 	
-	var html = "<p id='sokResultat'>Søk etter arkivpakke</p>"
+	var html = "<div class='jumbotron text-center'>"
+	+"<h2>Søk etter arkivpakke:</h2>"
+	+"<div class='form-group'>"
+	+"<div class='col-sm-6'>"
 	+"<input id='arkivpakkeSøk' type='text' placeholder='Søk i arkivpakke database'>"
-	+"<button id='arkivpakkeSøkButton' class='btn btn-default'>Søk</button>"
-	+"<div id='antallArkivpakker'>"
-	+"<p>Velg antall arkivpakker som vises</p>"
-	+"<button>10</button>"
-	+"<button>20</button>"
-	+"<button>50</button>"
+	+"<button id='arkivpakkeSøkButton' class='btn btn-default'><span class='glyphicon glyphicon-search'> SØK</span></button>"
 	+"</div>"
-	+"<button id='slettetArkivpakker'>Vis slettet arkivpakker</button>"
+	+"</div>"
+	+"</div>"
+	+"<div id='antallArkivpakker'>"
+	+"<p>Velg antall arkivpakker som vises:</p>"
+	+"<button class='btn btn-default'>10</button>"
+	+"<button class='btn btn-default'>20</button>"
+	+"<button class='btn btn-default'>50</button>"
+	+"<button id='slettetArkivpakker' class='btn btn-default'>Vis slettet arkivpakker</button>"
+	+"</div>"
+	+"<p id='sokResultat'></p>"
 	document.getElementById("innhold").insertAdjacentHTML('beforeend',html);
 
 	//Knytter 'arkivpakkeSøk' input til en eventListener som kjører funksjonen 'arkivpakkeSøk' når Enter trykkes
