@@ -5,7 +5,7 @@ if(isset($_SESSION['brukernavn'])){
 	$query = 'SELECT k.kommuneNavn,b.brukerNavn,a.statusTekst,a.startDato,a.sluttDato,a.sistEndret,a.dokfil,a.arkivID
 	FROM arkivpakke a
 	INNER JOIN bruker b
-	ON a.ansvarlig = b.brukerID
+	ON a.endretAv = b.brukerID
 	INNER join kommune k
 	ON a.arkivskaper = k.kommuneNr
 	WHERE k.kommuneNavn LIKE ?
