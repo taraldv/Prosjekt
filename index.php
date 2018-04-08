@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="no">
 <head>
 	<title>Prosessverktøy</title>
 	<meta name="viewport" content="width=device-width">
