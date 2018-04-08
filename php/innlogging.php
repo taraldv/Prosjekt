@@ -13,8 +13,8 @@ if(isset($_POST['brukernavn'])){
 		$_SESSION['fornavn'] = $result[0]['fornavn'];
 		$_SESSION['etternavn'] = $result[0]['etternavn'];
 		header('Location: ../');
-	}
-}elseif (isset($_POST['brukernavn']) && count($_POST)>0) {
-	echo "<p>Feil passord eller brukernavn</p>";
-} 
+	} else {
+		echo "<p>Feil passord eller brukernavn</p>";
+	} 
+}
 ?>
