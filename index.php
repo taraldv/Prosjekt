@@ -6,8 +6,6 @@
 	<meta charset="utf-8">
 	<link rel="stylesheet" type="text/css" href="bootstrap-3.3.7-dist/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="main.css">
-	<script src="jquery/jquery-3.3.1.min.js"></script>
-	<script src="bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
 	<script src="javascript.js"></script>
 </head>
 <body>
