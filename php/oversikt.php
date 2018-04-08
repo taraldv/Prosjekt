@@ -3,7 +3,7 @@ require_once 'hjelpeFunksjoner.php';
 session_start();
 if(isset($_SESSION['brukernavn'])&&isset($_POST['antall'])){
 	$antall = $_POST['antall'];
-	$query = 'SELECT k.kommuneNavn,a.statusTekst,a.startDato,a.sluttDato,a.sistEndret,a.dokfil,a.arkivID,d.filnavn,d.filstørrelse
+	$query = 'SELECT k.kommuneNavn,a.statusTekst,a.startDato,a.sluttDato,a.sistEndret,a.arkivID,d.filnavn,d.filstørrelse
 	FROM arkivpakke a
 	INNER join kommune k
 	ON a.arkivskaper = k.kommuneNr

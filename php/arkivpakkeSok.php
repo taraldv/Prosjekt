@@ -2,23 +2,22 @@
 require_once 'hjelpeFunksjoner.php';
 session_start();
 if(isset($_SESSION['brukernavn'])){
-	$query = 'SELECT k.kommuneNavn,b.brukerNavn,a.statusTekst,a.startDato,a.sluttDato,a.sistEndret,a.dokfil,a.arkivID
+	$query = 'SELECT k.kommuneNavn,a.statusTekst,a.startDato,a.sluttDato,a.sistEndret,a.arkivID,d.filnavn,d.filstørrelse
 	FROM arkivpakke a
-	INNER JOIN bruker b
-	ON a.endretAv = b.brukerID
 	INNER join kommune k
 	ON a.arkivskaper = k.kommuneNr
+	INNER join doklager d
+	ON a.dokfil = d.filID
 	WHERE k.kommuneNavn LIKE ?
-	OR b.brukernavn LIKE ?
 	OR a.statusTekst LIKE ?
 	OR a.startDato LIKE ?
 	OR a.sluttDato LIKE ?
 	OR a.sistEndret LIKE ?
-	OR a.dokfil LIKE ?
+	OR d.filnavn LIKE ?
 	ORDER BY a.sluttDato DESC';
 	$arkivpakke = '%'.$_POST['arkivpakke'].'%';
-	$param = array($arkivpakke,$arkivpakke,$arkivpakke,$arkivpakke,$arkivpakke,$arkivpakke,$arkivpakke);
-	$result = databaseKobling($query,'sssssss',$param);
+	$param = array($arkivpakke,$arkivpakke,$arkivpakke,$arkivpakke,$arkivpakke,$arkivpakke);
+	$result = databaseKobling($query,'ssssss',$param);
 	echo json_encode($result);
 }
 ?>
