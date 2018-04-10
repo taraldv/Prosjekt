@@ -1,4 +1,10 @@
-/*use prosjektdatabase;*/
+DROP DATABASE IF EXISTS prosjektdatabase;
+
+CREATE DATABASE prosjektdatabase
+  CHARACTER SET utf8
+  COLLATE utf8_general_ci;
+
+USE prosjektdatabase;
 
 DROP TABLE IF EXISTS logg;
 DROP TABLE IF EXISTS arkivpakke;
