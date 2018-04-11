@@ -8,7 +8,7 @@ if(isset($_SESSION['brukernavn'])){
 	$filResult = databaseKobling($filNavnQuery,'i',array($arkivpakkeID));
 	$filId = $filResult[0]['filID'];
 	$filnavn = $filResult[0]['filnavn'];
-	$dir = '/home/skule/doklager/';
+	$dir = '~/doklager/';
 	$fil = "$dir$filId$filnavn";
 
 	if(file_exists($fil)){

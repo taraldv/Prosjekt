@@ -19,7 +19,7 @@ if (isset($_SESSION['brukernavn']) && isset($_POST['statustype'])){
 	$arkivpakkeQuery = 'SELECT nyArkivpakke(?,?,?,?,?,?,?) AS filID';
 	$array = array($filnavn,$filstr,$kommuneID[0]['kommuneNr'],$statusTekst,$startDato,$sluttDato,$brukerID[0]['brukerID']);
 	$filIDResultat = databaseKobling($arkivpakkeQuery,'sdisssi',$array);
-	$dir = '/home/skule/doklager/';
+	$dir = '~/doklager/';
 	$filID = $filIDResultat[0]['filID'];
 
 	//Mangler error handling
