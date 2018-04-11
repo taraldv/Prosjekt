@@ -195,7 +195,7 @@ function settInnArkivpakkeEndring(){
 }
 
 
-//TODO: lag funksjon som kan brukes av ny arkivpakke og arkivpakke endring, dette er en kopi med små endringer.
+//Oppdaterer valgt arkivpakke, placeholder tekst inneholder nåværende verdier til arkivpakken
 function sendArkivpakkeEndring(){
 
 	//Funksjon som sjekker om input har en verdi tekst lengre enn 0
@@ -518,44 +518,50 @@ function settInnPassordEndring(){
 
 }
 
-//Sjekker først om gammelt passord er korrekt, hvis korrekt sendes oppdateres passord
+//Sjekker først om gammelt passord er korrekt, hvis korrekt sendes det nye passordet
 function oppdaterPassord(){
 	var nyttPassordInput = document.getElementById("nyttPassord");
 	var gammeltPassordInput = document.getElementById("gammeltPassord");
 
 	//Sender gammelt passord til endrePassord.php for å sjekke om det er korrekt 
-	//(svar fra php er enten 1 eller 0) og endrer input sin validity
 	httpPost(function(){
 		var inputField = document.getElementById("gammeltPassord");
+
+		//Endrer gammelt passord validity avhengig av response fra endrePassord.php
 		inputValidering(inputField,parseInt(this.response)==1,"Matcher ikke gammelt passord");
+
+		//Sletter error beskjed hvis den finnes
+		slettNode(document.querySelector(".red"));
+
+		//Hvis response fra endrePassord.php ikke er 1 så er gammelt passord feil
+		if (!parseInt(this.response)==1) {
+			document.getElementById("innhold").insertAdjacentHTML('beforeend',"<p class='red'>Gammelt passord er feil</p>");
+		}
+
+		//Sjekker om input er valid
+		if(gammeltPassordInput.checkValidity() && nyttPassordInput.checkValidity()){
+
+			//Sender gammelt og nytt passord til endrePassord.php
+			httpPost(function(){
+				if (parseInt(this.response)==1){
+					tømInnhold();
+					document.getElementById("innhold").insertAdjacentHTML('beforeend',"<p class='green'>Passord har blitt endret</p>");
+				} else {
+					document.getElementById("innhold").insertAdjacentHTML('beforeend',"<p class='red'>Server feil, prøv igjen senere</p>");
+				}
+			},"php/endrePassord.php","nyttPassord="+nyttPassordInput.value+"&gammeltPassord="+gammeltPassordInput.value);
+
+		}
 	},"php/endrePassord.php","gammeltPassord="+gammeltPassordInput.value);
-
-	//Sjekker om input er valid
-	if(gammeltPassordInput.checkValidity() && nyttPassordInput.checkValidity()){
-
-		//Sender gammelt passord for godkjenning og det nye passordet
-		httpPost(function(){
-			if (parseInt(this.response)==1){
-				tømInnhold();
-				document.getElementById("innhold").insertAdjacentHTML('beforeend',"<p class='green'>Passord har blitt endret</p>");
-			} else {
-				//sql error
-			}
-		},"php/endrePassord.php","nyttPassord="+nyttPassordInput.value+"&gammeltPassord="+gammeltPassordInput.value);
-	}
 }
 
 
-//Sender POST spørring med paramter til URL. Med en eventlistener som kjører på 'load'
-function httpPost(funksjon,url,parameter,boolean){
-	
+//Sender POST spørring med paramter til URL. Med en eventlistener som kjører på 'load', altså hvis man får en respons
+function httpPost(funksjon,url,parameter){
 	var xmlHttpRequest = new XMLHttpRequest();
 	xmlHttpRequest.addEventListener("load", funksjon);
 	xmlHttpRequest.open("POST", url);
-	//Hvis boolean er true så blir content-type header ikke lagt til
-	if(!boolean){
-		xmlHttpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-	}
+	xmlHttpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xmlHttpRequest.send(parameter);
 }
 
@@ -566,6 +572,7 @@ function slettChildren(node){
 	}
 }
 
+//Sjekker om inndata er gyldig JSON
 function sjekkJSONresponse(json) {
 	try {
 		JSON.parse(json);
@@ -584,7 +591,7 @@ function tømInnhold(){
 	}
 }
 
-//Sletter valgt node
+//Sletter valgt node hvis den finnes
 function slettNode(node){
 	if(node){
 		node.parentNode.removeChild(node);
@@ -600,6 +607,7 @@ function loggSammenligning(objekt,tempObjekt){
 	}
 }
 
+//Endrer på validity til valgt input med valgt tekst
 function inputValidering(inputNode,boolean,errorTekst){
 	inputNode.setCustomValidity("");
 	inputNode.parentNode.classList.remove("has-error");

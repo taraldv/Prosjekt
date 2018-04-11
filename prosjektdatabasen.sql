@@ -1,10 +1,10 @@
-DROP DATABASE IF EXISTS prosjektdatabase;
+DROP DATABASE IF EXISTS v18gr6;
 
-CREATE DATABASE prosjektdatabase
+CREATE DATABASE v18gr6
   CHARACTER SET utf8
   COLLATE utf8_general_ci;
 
-USE prosjektdatabase;
+USE v18gr6;
 
 DROP TABLE IF EXISTS logg;
 DROP TABLE IF EXISTS arkivpakke;
