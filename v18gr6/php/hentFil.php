@@ -7,7 +7,7 @@ if(isset($_SESSION['brukernavn'])&&isset($_GET['arkivID'])){
 	$result = databaseKobling($query,'i',array($int));
 	$filId = $result[0]['filID'];
 	$filnavn = $result[0]['filnavn'];
-	$dir = '~/doklager/';
+	$dir = 'C:\xampp\doklager\\';
 	$file = "$dir$filId$filnavn";
 	if (file_exists($file)) {
 		header('Content-Description: File Transfer');

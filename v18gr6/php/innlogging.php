@@ -12,7 +12,7 @@ if(isset($_POST['brukernavn'])){
 		$_SESSION['brukernavn'] = $brukernavn;
 		$_SESSION['fornavn'] = $result[0]['fornavn'];
 		$_SESSION['etternavn'] = $result[0]['etternavn'];
-		header('Location: ../');
+		header('Location: ../v18gr6');
 	} else {
 		echo "<p>Feil passord eller brukernavn</p>";
 	} 
