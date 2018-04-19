@@ -1,6 +1,8 @@
 <?php  
 require_once 'hjelpeFunksjoner.php';
 session_start();
+
+//Henter x antall arkivpakker
 if(isset($_SESSION['brukernavn'])&&isset($_POST['antall'])){
 	$antall = $_POST['antall'];
 	$query = 'SELECT k.kommuneNavn,a.statusTekst,a.startDato,a.sluttDato,a.sistEndret,a.arkivID,d.filnavn,d.filstørrelse
@@ -13,6 +15,8 @@ if(isset($_SESSION['brukernavn'])&&isset($_POST['antall'])){
 	LIMIT ?';
 	$result = databaseKobling($query,'i',array($antall));
 	echo json_encode($result);
+
+//Henter arkivpakkene fra loggen som har blitt slettet
 } elseif (isset($_SESSION['brukernavn'])&&isset($_POST['slettet'])) {
 	$slettetQuery = 'SELECT arkivID FROM logg WHERE slettet = true';
 	echo json_encode(databaseKoblingUtenParam($slettetQuery));

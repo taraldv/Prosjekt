@@ -1,13 +1,20 @@
 <?php
 require_once 'hjelpeFunksjoner.php';
 session_start();
+
+//Sender tilbake statustyper fra database hvis POST inneholder statustype param.
 if (isset($_SESSION['brukernavn']) && isset($_POST['statustype'])){
 	$result = databaseKoblingUtenParam('SELECT * FROM statustype');
 	echo json_encode($result);
+
+//Sjekker om en kommune eksisterer hvis POST inneholder validering param.
+//Sender tilbake TRUE(1 i php) hvis valgt kommune fra POST eksisterer.
 } elseif (isset($_SESSION['brukernavn']) && isset($_POST['validering'])) {
 	$query = 'SELECT kommuneEksisterer(?) AS validering;';
 	$result = databaseKobling($query,'s',array($_POST['kommune']));
 	echo json_encode($result[0]);
+
+//Hvis $_FILES eksisterer settes det inn en ny arkivpakke og lastes opp valgt fil.
 } elseif (isset($_SESSION['brukernavn'])&&$_FILES) {
 	$filnavn = $_FILES['fil']['name'];
 	$filstr = $_FILES['fil']['size']/1000;
@@ -21,8 +28,6 @@ if (isset($_SESSION['brukernavn']) && isset($_POST['statustype'])){
 	$filIDResultat = databaseKobling($arkivpakkeQuery,'sdisssi',$array);
 	$dir = '~/doklager/';
 	$filID = $filIDResultat[0]['filID'];
-
-	//Mangler error handling
 	move_uploaded_file($_FILES['fil']['tmp_name'],"$dir$filID$filnavn");
 	echo "<p id='arkivpakkeOpprettet'>Arkivpakke opprettet</p>";
 }
