@@ -1,5 +1,6 @@
 <?php
 require_once 'hjelpeFunksjoner.php';
+require_once 'dir.php';
 session_start();
 
 //Sender tilbake statustyper fra database hvis POST inneholder statustype param.
@@ -26,7 +27,6 @@ if (isset($_SESSION['brukernavn']) && isset($_POST['statustype'])){
 	$arkivpakkeQuery = 'SELECT nyArkivpakke(?,?,?,?,?,?,?) AS filID';
 	$array = array($filnavn,$filstr,$kommuneID[0]['kommuneNr'],$statusTekst,$startDato,$sluttDato,$brukerID[0]['brukerID']);
 	$filIDResultat = databaseKobling($arkivpakkeQuery,'sdisssi',$array);
-	$dir = 'C:\xampp\doklager\\';
 	$filID = $filIDResultat[0]['filID'];
 	move_uploaded_file($_FILES['fil']['tmp_name'],"$dir$filID$filnavn");
 	echo "<p id='arkivpakkeOpprettet'>Arkivpakke opprettet</p>";

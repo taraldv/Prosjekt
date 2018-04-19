@@ -1,5 +1,6 @@
 <?php  
 require_once 'hjelpeFunksjoner.php';
+require_once 'dir.php';
 session_start();
 if(isset($_SESSION['brukernavn'])&&isset($_GET['arkivID'])){
 	$query = 'SELECT d.filID,d.filnavn FROM arkivpakke a INNER JOIN doklager d ON a.dokfil = d.filID WHERE a.arkivID = ?';
@@ -7,7 +8,6 @@ if(isset($_SESSION['brukernavn'])&&isset($_GET['arkivID'])){
 	$result = databaseKobling($query,'i',array($int));
 	$filId = $result[0]['filID'];
 	$filnavn = $result[0]['filnavn'];
-	$dir = 'C:\xampp\doklager\\';
 	$file = "$dir$filId$filnavn";
 	if (file_exists($file)) {
 		header('Content-Description: File Transfer');

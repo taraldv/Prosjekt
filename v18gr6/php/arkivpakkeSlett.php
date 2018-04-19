@@ -1,5 +1,6 @@
 <?php  
 require_once 'hjelpeFunksjoner.php';
+require_once 'dir.php';
 session_start();
 if(isset($_SESSION['brukernavn'])){
 	$arkivpakkeID = $_POST['arkivpakkeID'];
@@ -8,7 +9,6 @@ if(isset($_SESSION['brukernavn'])){
 	$filResult = databaseKobling($filNavnQuery,'i',array($arkivpakkeID));
 	$filId = $filResult[0]['filID'];
 	$filnavn = $filResult[0]['filnavn'];
-	$dir = '~/doklager/';
 	$fil = "$dir$filId$filnavn";
 
 	if(file_exists($fil)){

@@ -1,6 +1,6 @@
 <?php
-$hn = 'itfag.usn.no';
-$db = 'v18db37';
-$un = 'v18u37';
-$pw = 'skule2018oblig';
+$hn = 'localhost';
+$db = 'v18gr6';
+$un = 'root';
+$pw = 'passord';
 ?>
