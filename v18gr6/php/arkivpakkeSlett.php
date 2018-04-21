@@ -9,6 +9,10 @@ if(isset($_SESSION['brukernavn'])){
 	$filResult = databaseKobling($filNavnQuery,'i',array($arkivpakkeID));
 	$filId = $filResult[0]['filID'];
 	$filnavn = $filResult[0]['filnavn'];
+<<<<<<< HEAD:v18gr6/php/arkivpakkeSlett.php
+=======
+	$dir = '/home/skule/doklager/';
+>>>>>>> parent of 7a363b2... endret dir:php/arkivpakkeSlett.php
 	$fil = "$dir$filId$filnavn";
 
 	if(file_exists($fil)){

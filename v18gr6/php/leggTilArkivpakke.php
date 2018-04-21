@@ -27,6 +27,10 @@ if (isset($_SESSION['brukernavn']) && isset($_POST['statustype'])){
 	$arkivpakkeQuery = 'SELECT nyArkivpakke(?,?,?,?,?,?,?) AS filID';
 	$array = array($filnavn,$filstr,$kommuneID[0]['kommuneNr'],$statusTekst,$startDato,$sluttDato,$brukerID[0]['brukerID']);
 	$filIDResultat = databaseKobling($arkivpakkeQuery,'sdisssi',$array);
+<<<<<<< HEAD:v18gr6/php/leggTilArkivpakke.php
+=======
+	$dir = '/home/skule/doklager/';
+>>>>>>> parent of 7a363b2... endret dir:php/leggTilArkivpakke.php
 	$filID = $filIDResultat[0]['filID'];
 	move_uploaded_file($_FILES['fil']['tmp_name'],"$dir$filID$filnavn");
 	echo "<p id='arkivpakkeOpprettet'>Arkivpakke opprettet</p>";
