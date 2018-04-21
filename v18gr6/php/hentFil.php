@@ -8,10 +8,6 @@ if(isset($_SESSION['brukernavn'])&&isset($_GET['arkivID'])){
 	$result = databaseKobling($query,'i',array($int));
 	$filId = $result[0]['filID'];
 	$filnavn = $result[0]['filnavn'];
-<<<<<<< HEAD:v18gr6/php/hentFil.php
-=======
-	$dir = '/home/skule/doklager/';
->>>>>>> parent of 7a363b2... endret dir:php/hentFil.php
 	$file = "$dir$filId$filnavn";
 	if (file_exists($file)) {
 		header('Content-Description: File Transfer');
